@@ -1,0 +1,1398 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="theme-color" content="#111827" />
+  <meta name="color-scheme" content="dark" />
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#22c55e">
+
+  <link rel="icon" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <title>Invoice / Quote</title>
+
+  <style>
+    :root{
+      --bg:#0b1220;
+      --card:#111827;
+      --card2:#0f172a;
+      --text:#e5e7eb;
+      --muted:#9ca3af;
+      --line:#1f2937;
+      --accent:#22c55e;
+      --danger:#ef4444;
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --radius: 16px;
+    }
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      font-family: system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif;
+      background:var(--bg);
+      color:var(--text);
+    }
+    a{ color:inherit; }
+
+    .wrap{ max-width:1100px; margin:0 auto; padding:18px; padding-bottom:34px; }
+
+    .top{
+      display:flex; gap:12px; align-items:flex-start; justify-content:space-between; flex-wrap:wrap;
+      margin-bottom:14px;
+    }
+    .brand{ display:flex; flex-direction:column; gap:4px; }
+    .brand h1{ margin:0; font-size:18px; letter-spacing:.2px; }
+    .brand .sub{ color:var(--muted); font-size:12px; }
+
+    .pill{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:flex-end; }
+    .pill .chip{
+      background:rgba(255,255,255,.04);
+      border:1px solid var(--line);
+      padding:8px 10px;
+      border-radius:999px;
+      font-size:12px;
+      color:var(--muted);
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+    .pill select{
+      background:var(--card2);
+      border:1px solid var(--line);
+      border-radius:999px;
+      padding:6px 10px;
+      color:var(--text);
+      font-size:12px;
+      outline:none;
+      color-scheme: dark;
+    }
+    .pill select:focus{ border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+
+    .grid{ display:grid; grid-template-columns: 1.1fr .9fr; gap:14px; }
+    @media (max-width: 980px){ .grid{ grid-template-columns: 1fr; } }
+
+    .card{
+      background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .card .hd{
+      padding:14px 14px 10px;
+      border-bottom:1px solid var(--line);
+      display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;
+    }
+    .card .hd h2{ margin:0; font-size:14px; color:var(--text); }
+    .card .bd{ padding:14px; }
+
+    .row{ display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:10px; }
+    @media (max-width: 560px){ .row{ grid-template-columns: 1fr; } }
+
+    label{ display:block; font-size:12px; color:var(--muted); margin-bottom:6px; }
+    input, select, textarea, button{ font: inherit; }
+
+    input[type="text"], textarea, select{
+      width:100%;
+      background:var(--card2);
+      color:var(--text);
+      border:1px solid var(--line);
+      border-radius:12px;
+      padding:10px 12px;
+      outline:none;
+      font-size:16px; /* iOS: prevents zoom + improves visibility */
+    }
+    textarea{ min-height:84px; resize:vertical; }
+
+    select{
+      appearance:none;
+      -webkit-appearance:none;
+      color-scheme: dark;
+    }
+    select option{ background-color: var(--card); color: var(--text); }
+
+    input[type="text"]:focus, textarea:focus, select:focus{
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px var(--accent);
+    }
+
+    .btn{
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.04);
+      color:var(--text);
+      padding:10px 12px;
+      border-radius:12px;
+      cursor:pointer;
+      user-select:none;
+    }
+    .btn.primary{ background: rgba(34,197,94,.14); border-color: rgba(34,197,94,.45); }
+    .btn.danger{ background: rgba(239,68,68,.12); border-color: rgba(239,68,68,.45); }
+    .btn.small{ padding:8px 10px; font-size:12px; border-radius:10px; }
+
+    .muted{ color:var(--muted); }
+    .hint{ font-size:12px; color:var(--muted); line-height:1.35; }
+
+    .svcAdd{ display:flex; gap:10px; align-items:end; flex-wrap:wrap; }
+    .svcAdd > div{ flex: 1 1 260px; }
+
+    table{
+      width:100%;
+      border-collapse:collapse;
+      border-radius:12px;
+      overflow:hidden;
+      border:1px solid var(--line);
+    }
+    th, td{
+      border-bottom:1px solid var(--line);
+      padding:10px;
+      font-size:13px;
+      vertical-align:middle;
+    }
+    th{ color:var(--muted); font-size:12px; background:rgba(255,255,255,.03); }
+    tr:last-child td{ border-bottom:none; }
+    td.right{ text-align:right; }
+
+    .qtyBox{ display:flex; gap:8px; align-items:center; }
+    .qtyBox input{
+      width: 140px;
+      max-width: 100%;
+      text-align:left;
+      -webkit-user-select:text;
+      user-select:text;
+      touch-action:manipulation;
+    }
+
+    /* Mobile stacked service rows */
+    @media (max-width: 620px){
+      thead{ display:none; }
+      table, tbody, tr, td{ display:block; width:100%; }
+      tr{
+        border-bottom:1px solid var(--line);
+        padding:10px 10px 12px;
+      }
+      td{ border-bottom:none; padding:6px 0; }
+      td.right{ text-align:left; }
+
+      td[data-label]::before{
+        content: attr(data-label);
+        display:block;
+        font-size:12px;
+        color:var(--muted);
+        margin-bottom:6px;
+      }
+      .qtyBox input{ width:100%; }
+      td .btn{ width:100%; }
+    }
+
+    .totals{ display:flex; flex-direction:column; gap:10px; }
+    .lineItem{
+      display:flex; justify-content:space-between; gap:10px; align-items:center;
+      padding:10px 12px; border:1px solid var(--line); border-radius:12px;
+      background:rgba(255,255,255,.02);
+    }
+    .lineItem .k{ color:var(--muted); font-size:12px; }
+    .lineItem .v{ font-size:14px; }
+    .grand{ border-color: rgba(34,197,94,.45); background: rgba(34,197,94,.08); }
+    .grand .v{ font-size:18px; font-weight:700; }
+    .split{ display:flex; gap:10px; flex-wrap:wrap; }
+    .split .btn{ flex: 1 1 180px; }
+
+    .toast{
+      position:fixed; left:50%; bottom:18px; transform:translateX(-50%);
+      background:rgba(17,24,39,.92); border:1px solid var(--line);
+      color:var(--text); padding:10px 12px; border-radius:12px;
+      box-shadow: var(--shadow); display:none; z-index:9999;
+      max-width:min(720px, calc(100% - 24px)); font-size:13px;
+    }
+    .toast.show{ display:block; }
+
+    /* Add-ons (collapsible) */
+    details.accordion{
+      border:1px solid var(--line);
+      border-radius:12px;
+      background:rgba(255,255,255,.02);
+      overflow:hidden;
+      margin-top:10px;
+      margin-bottom:12px;
+    }
+    details.accordion > summary{
+      list-style:none;
+      cursor:pointer;
+      padding:10px 12px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      user-select:none;
+    }
+    details.accordion > summary::-webkit-details-marker{ display:none; }
+    .accTitle{
+      display:flex; flex-direction:column; gap:2px;
+    }
+    .accTitle .t{ font-weight:600; font-size:13px; }
+    .accTitle .s{ font-size:12px; color:var(--muted); }
+    .chev{
+      color:var(--muted);
+      font-size:12px;
+      border:1px solid var(--line);
+      border-radius:999px;
+      padding:6px 10px;
+      background:rgba(255,255,255,.03);
+      white-space:nowrap;
+    }
+    details[open] .chev{ border-color: rgba(34,197,94,.35); color: var(--text); }
+    .accBody{ padding:12px; border-top:1px solid var(--line); }
+
+    .toggleRow{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      padding:10px 12px;
+      border:1px solid var(--line);
+      border-radius:12px;
+      background:rgba(255,255,255,.02);
+      margin-bottom:10px;
+    }
+    .toggleRow:last-child{ margin-bottom:0; }
+    .toggleLeft{ display:flex; flex-direction:column; gap:2px; }
+    .toggleLeft .name{ font-size:13px; font-weight:600; }
+    .toggleLeft .desc{ font-size:12px; color:var(--muted); line-height:1.25; }
+    .toggleRight{
+      display:flex; align-items:center; gap:8px;
+      min-width: 190px;
+    }
+    .toggleRight input[type="text"]{ min-width: 130px; }
+    .switch{
+      width:44px; height:28px; border-radius:999px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.04);
+      position:relative;
+      cursor:pointer;
+      flex: 0 0 auto;
+    }
+    .switch::after{
+      content:"";
+      position:absolute; top:50%; left:4px;
+      width:20px; height:20px; border-radius:999px;
+      transform:translateY(-50%);
+      background:rgba(255,255,255,.35);
+      transition: all .15s ease;
+    }
+    .switch.on{
+      border-color: rgba(34,197,94,.45);
+      background: rgba(34,197,94,.12);
+    }
+    .switch.on::after{
+      left:20px;
+      background: rgba(34,197,94,.85);
+    }
+    .toggleRight .amtOff{
+      opacity:.45;
+      pointer-events:none;
+    }
+
+    @media print{
+      .btn, .pill, .toast, details.accordion{ display:none !important; }
+      body{ background:white; color:black; }
+      .card{ box-shadow:none; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="top">
+      <div class="brand">
+        <h1 id="hdrBizName">Invoice / Quote</h1>
+        <div class="sub" id="hdrBizLine"></div>
+      </div>
+      <div class="pill">
+        <div class="chip" data-i18n="chip_mobile">Mobile-friendly rows</div>
+        <div class="chip" data-i18n="chip_calc">Labor + Add-ons + Overhead + Profit</div>
+        <div class="chip">
+          <span data-i18n="lang_label">Language</span>
+          <select id="langSel" aria-label="Language">
+            <option value="en">EN</option>
+            <option value="es">ES</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid">
+      <!-- LEFT -->
+      <div class="card">
+        <div class="hd">
+          <h2 data-i18n="left_title">Job details & services</h2>
+          <div class="split">
+            <button class="btn small" id="btnReset" data-i18n="btn_reset">Reset</button>
+            <button class="btn small" id="btnSample" data-i18n="btn_sample">Load sample</button>
+            <button class="btn small" id="btnSave" data-i18n="btn_save">Save</button>
+          </div>
+        </div>
+        <div class="bd">
+          <div class="row">
+            <div>
+              <label data-i18n="lab_bizname">Business name</label>
+              <input id="bizName" type="text" />
+            </div>
+            <div>
+              <label data-i18n="lab_bizphone">Business phone</label>
+              <input id="bizPhone" type="text" />
+            </div>
+          </div>
+
+          <div class="row">
+            <div style="grid-column:1/-1">
+              <label data-i18n="lab_bizaddr">Business address</label>
+              <input id="bizAddr" type="text" />
+            </div>
+          </div>
+
+          <div style="height:8px"></div>
+
+          <div class="row">
+            <div>
+              <label data-i18n="lab_custname">Customer name</label>
+              <input id="custName" type="text" />
+            </div>
+            <div>
+              <label data-i18n="lab_jobaddr">Job address</label>
+              <input id="jobAddr" type="text" />
+            </div>
+          </div>
+
+          <div class="row">
+            <div>
+              <label data-i18n="lab_invno">Invoice / Quote #</label>
+              <input id="invNo" type="text" />
+            </div>
+            <div>
+              <label data-i18n="lab_date">Date</label>
+              <input id="invDate" type="text" />
+            </div>
+          </div>
+
+          <div class="row">
+            <div style="grid-column:1/-1">
+              <label data-i18n="lab_notes">Notes</label>
+              <textarea id="notes"></textarea>
+            </div>
+          </div>
+
+          <div class="svcAdd" style="margin-top:12px;">
+            <div>
+              <label data-i18n="lab_addsvc">Add service</label>
+              <select id="svcPicker">
+                <option value="" selected disabled data-i18n="svc_select">Select a service…</option>
+              </select>
+              <div class="hint" style="margin-top:6px;" data-i18n="hint_mobile_cards">
+                On phones, services become stacked “cards” so inputs stay visible.
+              </div>
+            </div>
+            <button class="btn primary" id="btnAddSvc" data-i18n="btn_add">Add</button>
+          </div>
+
+          <div style="margin-top:12px;">
+            <table>
+              <thead>
+                <tr>
+                  <th style="width:34%;" data-i18n="th_service">Service</th>
+                  <th style="width:18%;" data-i18n="th_unit">Unit</th>
+                  <th style="width:18%;" data-i18n="th_qty">Qty</th>
+                  <th style="width:18%;" class="right" data-i18n="th_unitprice">Unit $</th>
+                  <th style="width:12%;" class="right" data-i18n="th_line">Line $</th>
+                  <th style="width:1%;"></th>
+                </tr>
+              </thead>
+              <tbody id="svcTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT -->
+      <div class="card">
+        <div class="hd">
+          <h2 data-i18n="right_title">Pricing settings & totals</h2>
+          <button class="btn small" id="btnCopyText" data-i18n="btn_copy">Copy summary</button>
+        </div>
+        <div class="bd">
+          <div class="row">
+            <div>
+              <label data-i18n="lab_labor_rate">Labor $/hr</label>
+              <input id="laborRate" type="text" inputmode="decimal" placeholder="0" />
+            </div>
+            <div>
+              <label data-i18n="lab_labor_hours">Labor hours (total)</label>
+              <input id="laborHours" type="text" inputmode="decimal" placeholder="0" />
+            </div>
+          </div>
+
+          <div class="row">
+            <div>
+              <label data-i18n="lab_overhead">Overhead %</label>
+              <input id="overheadPct" type="text" inputmode="decimal" placeholder="0" />
+            </div>
+            <div>
+              <label data-i18n="lab_profit">Profit %</label>
+              <input id="profitPct" type="text" inputmode="decimal" placeholder="0" />
+            </div>
+          </div>
+
+          <div class="row">
+            <div>
+              <label data-i18n="lab_minjob">Minimum job fee $</label>
+              <input id="minJob" type="text" inputmode="decimal" placeholder="0" />
+            </div>
+            <div>
+              <label data-i18n="lab_discount">Discount $ (optional)</label>
+              <input id="discount" type="text" inputmode="decimal" placeholder="0" />
+            </div>
+          </div>
+
+          <!-- ADD-ONS (collapsible, clean) -->
+          <details class="accordion" id="addonsBox">
+            <summary>
+              <div class="accTitle">
+                <div class="t" data-i18n="addons_title">Add-ons / Extras</div>
+                <div class="s" data-i18n="addons_sub">Optional charges to improve accuracy</div>
+              </div>
+              <div class="chev" data-i18n="addons_toggle_hint">Tap to open</div>
+            </summary>
+            <div class="accBody">
+              <div class="toggleRow">
+                <div class="toggleLeft">
+                  <div class="name" data-i18n="lab_equip">Equipment wear & tear</div>
+                  <div class="desc" data-i18n="desc_equip">Maintenance, repairs, and depreciation for tools/machines.</div>
+                </div>
+                <div class="toggleRight">
+                  <div class="switch" id="swEquip" role="switch" aria-checked="false" tabindex="0"></div>
+                  <input id="equipFee" type="text" inputmode="decimal" placeholder="0.00" />
+                </div>
+              </div>
+
+              <div class="toggleRow">
+                <div class="toggleLeft">
+                  <div class="name" data-i18n="lab_materials">Materials & consumables</div>
+                  <div class="desc" data-i18n="desc_materials">Mulch, soil, plants, seed, edging, fuel, etc.</div>
+                </div>
+                <div class="toggleRight">
+                  <div class="switch" id="swMaterials" role="switch" aria-checked="false" tabindex="0"></div>
+                  <input id="materialsFee" type="text" inputmode="decimal" placeholder="0.00" />
+                </div>
+              </div>
+
+              <div class="toggleRow">
+                <div class="toggleLeft">
+                  <div class="name" data-i18n="lab_disposal">Disposal / dump fees</div>
+                  <div class="desc" data-i18n="desc_disposal">Landfill fees and time for hauling debris away.</div>
+                </div>
+                <div class="toggleRight">
+                  <div class="switch" id="swDisposal" role="switch" aria-checked="false" tabindex="0"></div>
+                  <input id="disposalFee" type="text" inputmode="decimal" placeholder="0.00" />
+                </div>
+              </div>
+
+              <div class="toggleRow">
+                <div class="toggleLeft">
+                  <div class="name" data-i18n="lab_travel">Travel & mobilization</div>
+                  <div class="desc" data-i18n="desc_travel">Drive time, fuel, loading/unloading, and trailer setup.</div>
+                </div>
+                <div class="toggleRight">
+                  <div class="switch" id="swTravel" role="switch" aria-checked="false" tabindex="0"></div>
+                  <input id="travelFee" type="text" inputmode="decimal" placeholder="0.00" />
+                </div>
+              </div>
+
+              <div class="hint" style="margin-top:10px;" data-i18n="addons_tip">
+                Tip: keep add-ons OFF for simple jobs, turn ON for more accurate quotes.
+              </div>
+            </div>
+          </details>
+
+          <div style="margin:14px 0 10px;">
+            <div class="totals">
+              <div class="lineItem">
+                <div><div class="k" data-i18n="k_services">Services subtotal</div><div class="v" id="tServices">$0.00</div></div>
+                <div class="muted" id="tServicesMeta"></div>
+              </div>
+              <div class="lineItem">
+                <div><div class="k" data-i18n="k_labor">Labor</div><div class="v" id="tLabor">$0.00</div></div>
+                <div class="muted" id="tLaborMeta"></div>
+              </div>
+
+              <!-- NEW ADD-ONS TOTALS -->
+              <div class="lineItem">
+                <div><div class="k" data-i18n="k_equip">Equipment wear & tear</div><div class="v" id="tEquip">$0.00</div></div>
+                <div class="muted" id="tEquipMeta"></div>
+              </div>
+              <div class="lineItem">
+                <div><div class="k" data-i18n="k_materials">Materials & consumables</div><div class="v" id="tMaterials">$0.00</div></div>
+                <div class="muted" id="tMaterialsMeta"></div>
+              </div>
+              <div class="lineItem">
+                <div><div class="k" data-i18n="k_disposal">Disposal fees</div><div class="v" id="tDisposal">$0.00</div></div>
+                <div class="muted" id="tDisposalMeta"></div>
+              </div>
+              <div class="lineItem">
+                <div><div class="k" data-i18n="k_travel">Travel & mobilization</div><div class="v" id="tTravel">$0.00</div></div>
+                <div class="muted" id="tTravelMeta"></div>
+              </div>
+
+              <div class="lineItem">
+                <div><div class="k" data-i18n="k_overhead">Overhead</div><div class="v" id="tOverhead">$0.00</div></div>
+                <div class="muted" id="tOverheadMeta"></div>
+              </div>
+              <div class="lineItem">
+                <div><div class="k" data-i18n="k_profit">Profit</div><div class="v" id="tProfit">$0.00</div></div>
+                <div class="muted" id="tProfitMeta"></div>
+              </div>
+              <div class="lineItem">
+                <div><div class="k" data-i18n="k_discount">Discount</div><div class="v" id="tDiscount">$0.00</div></div>
+                <div class="muted" id="tDiscountMeta"></div>
+              </div>
+              <div class="lineItem grand">
+                <div><div class="k" data-i18n="k_total">Grand total</div><div class="v" id="tGrand">$0.00</div></div>
+                <div class="muted" id="tGrandMeta"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="split">
+            <button class="btn primary" id="btnPrint" data-i18n="btn_print">Print / Save PDF</button>
+            <button class="btn" id="btnExport" data-i18n="btn_export">Export JSON</button>
+            <button class="btn" id="btnImport" data-i18n="btn_import">Import JSON</button>
+          </div>
+
+          <div class="hint" style="margin-top:10px;" data-i18n="hint_print">
+            Print tip: choose “Save as PDF”.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const $$ = (sel) => document.querySelector(sel);
+
+    const I18N = {
+      en: {
+        chip_mobile: "Mobile-friendly rows",
+        chip_calc: "Labor + Add-ons + Overhead + Profit",
+        lang_label: "Language",
+
+        left_title: "Job details & services",
+        right_title: "Pricing settings & totals",
+
+        btn_reset: "Reset",
+        btn_sample: "Load sample",
+        btn_save: "Save",
+        btn_add: "Add",
+        btn_copy: "Copy summary",
+        btn_print: "Print / Save PDF",
+        btn_export: "Export JSON",
+        btn_import: "Import JSON",
+
+        lab_bizname: "Business name",
+        ph_bizname: "Your business name",
+        lab_bizphone: "Business phone",
+        ph_bizphone: "(217) 555-1234",
+        lab_bizaddr: "Business address",
+        ph_bizaddr: "Street, City, State ZIP",
+
+        lab_custname: "Customer name",
+        ph_custname: "John Smith",
+        lab_jobaddr: "Job address",
+        ph_jobaddr: "123 Main St, City, IL",
+
+        lab_invno: "Invoice / Quote #",
+        ph_invno: "AL-0001",
+        lab_date: "Date",
+        lab_notes: "Notes",
+        ph_notes: "Optional notes (scope, timeline, warranty, etc.)",
+
+        lab_addsvc: "Add service",
+        svc_select: "Select a service…",
+        hint_mobile_cards: "On phones, services become stacked “cards” so inputs stay visible.",
+
+        th_service: "Service",
+        th_unit: "Unit",
+        th_qty: "Qty",
+        th_unitprice: "Unit $",
+        th_line: "Line $",
+
+        dl_service: "Service",
+        dl_unit: "Unit",
+        dl_qty: "Qty",
+        dl_unitprice: "Unit $",
+        dl_line: "Line $",
+        dl_remove: "Remove",
+        btn_remove: "Remove",
+
+        lab_labor_rate: "Labor $/hr",
+        lab_labor_hours: "Labor hours (total)",
+        lab_overhead: "Overhead %",
+        lab_profit: "Profit %",
+        lab_minjob: "Minimum job fee $",
+        lab_discount: "Discount $ (optional)",
+
+        addons_title: "Add-ons / Extras",
+        addons_sub: "Optional charges to improve accuracy",
+        addons_toggle_hint: "Tap to open",
+        addons_tip: "Tip: keep add-ons OFF for simple jobs, turn ON for more accurate quotes.",
+
+        lab_equip: "Equipment wear & tear",
+        desc_equip: "Maintenance, repairs, and depreciation for tools/machines.",
+        lab_materials: "Materials & consumables",
+        desc_materials: "Mulch, soil, plants, seed, edging, fuel, etc.",
+        lab_disposal: "Disposal / dump fees",
+        desc_disposal: "Landfill fees and time for hauling debris away.",
+        lab_travel: "Travel & mobilization",
+        desc_travel: "Drive time, fuel, loading/unloading, and trailer setup.",
+
+        k_services: "Services subtotal",
+        k_labor: "Labor",
+        k_equip: "Equipment wear & tear",
+        k_materials: "Materials & consumables",
+        k_disposal: "Disposal fees",
+        k_travel: "Travel & mobilization",
+        k_overhead: "Overhead",
+        k_profit: "Profit",
+        k_discount: "Discount",
+        k_total: "Grand total",
+
+        hint_print: "Print tip: choose “Save as PDF”.",
+
+        hdr_default: "Invoice / Quote",
+        hdr_enter_biz: "Enter your business info above.",
+        toast_pick_service: "Pick a service first.",
+        toast_saved: "Saved.",
+        toast_sample: "Sample loaded.",
+        toast_reset: "Reset done.",
+        toast_copy_ok: "Summary copied.",
+        toast_copy_fail: "Copy failed.",
+        toast_import_ok: "Imported.",
+        toast_import_fail: "Import failed."
+      },
+      es: {
+        chip_mobile: "Filas amigables en móvil",
+        chip_calc: "Mano de obra + Extras + Gastos + Ganancia",
+        lang_label: "Idioma",
+
+        left_title: "Detalles del trabajo y servicios",
+        right_title: "Ajustes de precios y totales",
+
+        btn_reset: "Restablecer",
+        btn_sample: "Cargar ejemplo",
+        btn_save: "Guardar",
+        btn_add: "Agregar",
+        btn_copy: "Copiar resumen",
+        btn_print: "Imprimir / Guardar PDF",
+        btn_export: "Exportar JSON",
+        btn_import: "Importar JSON",
+
+        lab_bizname: "Nombre del negocio",
+        ph_bizname: "Tu nombre de negocio",
+        lab_bizphone: "Teléfono del negocio",
+        ph_bizphone: "(217) 555-1234",
+        lab_bizaddr: "Dirección del negocio",
+        ph_bizaddr: "Calle, Ciudad, Estado ZIP",
+
+        lab_custname: "Nombre del cliente",
+        ph_custname: "Juan Pérez",
+        lab_jobaddr: "Dirección del trabajo",
+        ph_jobaddr: "123 Main St, Ciudad, IL",
+
+        lab_invno: "Factura / Cotización #",
+        ph_invno: "AL-0001",
+        lab_date: "Fecha",
+        lab_notes: "Notas",
+        ph_notes: "Notas opcionales (alcance, tiempo, garantía, etc.)",
+
+        lab_addsvc: "Agregar servicio",
+        svc_select: "Selecciona un servicio…",
+        hint_mobile_cards: "En el teléfono, los servicios se muestran como “tarjetas” para que los campos se vean al escribir.",
+
+        th_service: "Servicio",
+        th_unit: "Unidad",
+        th_qty: "Cantidad",
+        th_unitprice: "Precio unitario",
+        th_line: "Total",
+
+        dl_service: "Servicio",
+        dl_unit: "Unidad",
+        dl_qty: "Cantidad",
+        dl_unitprice: "Precio unitario",
+        dl_line: "Total",
+        dl_remove: "Quitar",
+        btn_remove: "Quitar",
+
+        lab_labor_rate: "Mano de obra $/hora",
+        lab_labor_hours: "Horas de mano de obra",
+        lab_overhead: "Gastos generales %",
+        lab_profit: "Ganancia %",
+        lab_minjob: "Mínimo por trabajo $",
+        lab_discount: "Descuento $ (opcional)",
+
+        addons_title: "Extras / Cargos opcionales",
+        addons_sub: "Cargos opcionales para mayor precisión",
+        addons_toggle_hint: "Toca para abrir",
+        addons_tip: "Tip: deja los extras APAGADOS en trabajos simples y ENCIÉNDELOS para cotizaciones más precisas.",
+
+        lab_equip: "Desgaste de equipo",
+        desc_equip: "Mantenimiento, reparaciones y depreciación de herramientas/máquinas.",
+        lab_materials: "Materiales y consumibles",
+        desc_materials: "Mulch, tierra, plantas, semilla, orilla, gasolina, etc.",
+        lab_disposal: "Basurero / tiradero",
+        desc_disposal: "Costo del tiradero y tiempo para llevar la basura o escombro.",
+        lab_travel: "Traslado y movilización",
+        desc_travel: "Tiempo de manejo, gasolina, cargar/descargar y preparar el remolque.",
+
+        k_services: "Subtotal de servicios",
+        k_labor: "Mano de obra",
+        k_equip: "Desgaste de equipo",
+        k_materials: "Materiales y consumibles",
+        k_disposal: "Cargos de basurero",
+        k_travel: "Traslado y movilización",
+        k_overhead: "Gastos generales",
+        k_profit: "Ganancia",
+        k_discount: "Descuento",
+        k_total: "Total final",
+
+        hint_print: "Tip: en Imprimir elige “Guardar como PDF”.",
+
+        hdr_default: "Factura / Cotización",
+        hdr_enter_biz: "Ingresa la información de tu negocio arriba.",
+        toast_pick_service: "Primero selecciona un servicio.",
+        toast_saved: "Guardado.",
+        toast_sample: "Ejemplo cargado.",
+        toast_reset: "Restablecido.",
+        toast_copy_ok: "Resumen copiado.",
+        toast_copy_fail: "No se pudo copiar.",
+        toast_import_ok: "Importado.",
+        toast_import_fail: "Falló la importación."
+      }
+    };
+
+    const SERVICE_CATALOG = [
+      { key:"mowing",   unitKey:"per_cut",  en:{name:"Mowing",               unit:"per cut"},     es:{name:"Corte de césped",        unit:"por corte"} },
+      { key:"trimming", unitKey:"flat",     en:{name:"Trimming / Edging",    unit:"flat"},        es:{name:"Recorte / Orilla",       unit:"fijo"} },
+      { key:"mulch",    unitKey:"cuyd",     en:{name:"Mulch install",        unit:"cubic yard"},  es:{name:"Instalación de mulch",   unit:"yarda cúbica"} },
+      { key:"rock",     unitKey:"ton",      en:{name:"Rock / Gravel",        unit:"ton"},         es:{name:"Piedra / Grava",         unit:"tonelada"} },
+      { key:"soil",     unitKey:"yd",       en:{name:"Soil / Topsoil",       unit:"yard"},        es:{name:"Tierra / Tierra negra",  unit:"yarda"} },
+      { key:"sod",      unitKey:"sqft",     en:{name:"Sod install",          unit:"sq ft"},       es:{name:"Instalación de césped",  unit:"pie²"} },
+      { key:"leaf",     unitKey:"hour",     en:{name:"Leaf cleanup",         unit:"hour"},        es:{name:"Limpieza de hojas",      unit:"hora"} },
+      { key:"bush",     unitKey:"per_bush", en:{name:"Bush trimming",        unit:"per bush"},    es:{name:"Poda de arbustos",       unit:"por arbusto"} },
+      { key:"hedge",    unitKey:"linft",    en:{name:"Hedge trimming",       unit:"linear ft"},   es:{name:"Poda de seto",           unit:"pie lineal"} },
+      { key:"cleanup",  unitKey:"flat",     en:{name:"Spring / Fall cleanup",unit:"flat"},        es:{name:"Limpieza primavera/otoño",unit:"fijo"} },
+      { key:"weeding",  unitKey:"hour",     en:{name:"Weeding",              unit:"hour"},        es:{name:"Deshierbe",              unit:"hora"} },
+      { key:"haul",     unitKey:"flat",     en:{name:"Haul-away / Dump fee", unit:"flat"},        es:{name:"Retiro / Basurero",      unit:"fijo"} },
+    ];
+
+    const DEFAULT_STATE = () => ({
+      lang: "en",
+      business: { name:"", phone:"", address:"" },
+      meta: { custName:"", jobAddr:"", invNo:"", invDate: todayStr(), notes:"" },
+      settings: {
+        laborRate:0, laborHours:0,
+        overheadPct:0, profitPct:0,
+        minJob:0, discount:0,
+        // NEW add-ons (enabled toggles + amounts)
+        equipOn:false, equipFee:0,
+        materialsOn:false, materialsFee:0,
+        disposalOn:false, disposalFee:0,
+        travelOn:false, travelFee:0
+      },
+      services: []
+    });
+
+    let state = DEFAULT_STATE();
+
+    function t(key){
+      const lang = state.lang || "en";
+      return (I18N[lang] && I18N[lang][key]) || (I18N.en[key] || key);
+    }
+
+    function todayStr(){
+      const d = new Date();
+      const mm = String(d.getMonth()+1).padStart(2,"0");
+      const dd = String(d.getDate()).padStart(2,"0");
+      const yy = d.getFullYear();
+      return `${mm}/${dd}/${yy}`;
+    }
+
+    function toast(msg){
+      const el = $$("#toast");
+      el.textContent = msg;
+      el.classList.add("show");
+      clearTimeout(toast._t);
+      toast._t = setTimeout(()=> el.classList.remove("show"), 2200);
+    }
+
+    function parseNumLoose(s){
+      if (s == null) return NaN;
+      const tt = String(s).replace(/[^0-9.\-]/g, "");
+      if (tt === "" || tt === "-" || tt === "." || tt === "-.") return NaN;
+      return Number(tt);
+    }
+    function money(n){ return (!isFinite(n) ? "$0.00" : "$" + n.toFixed(2)); }
+    function toFixed2(n){ return (!isFinite(n) ? "" : n.toFixed(2)); }
+    function clampNonNeg(n){ return (!isFinite(n) ? 0 : Math.max(0, n)); }
+
+    function bindNumberInput(el, getDefaultValue, onValue){
+      el.value = "";
+      el.addEventListener("input", () => {
+        const n = parseNumLoose(el.value);
+        onValue(isFinite(n) ? n : getDefaultValue());
+        recalc(); autosave();
+      });
+      el.addEventListener("blur", () => {
+        const n = parseNumLoose(el.value);
+        el.value = isFinite(n) ? String(n) : "";
+      });
+    }
+    function bindMoneyInput(el, getDefaultValue, onValue){
+      el.value = "";
+      el.addEventListener("input", () => {
+        const n = parseNumLoose(el.value);
+        onValue(isFinite(n) ? n : getDefaultValue());
+        recalc(); autosave();
+      });
+      el.addEventListener("blur", () => {
+        const n = parseNumLoose(el.value);
+        el.value = isFinite(n) ? toFixed2(n) : "";
+      });
+    }
+
+    // DOM
+    const langSel = $$("#langSel");
+
+    const hdrBizName = $$("#hdrBizName");
+    const hdrBizLine = $$("#hdrBizLine");
+
+    const bizName = $$("#bizName");
+    const bizPhone = $$("#bizPhone");
+    const bizAddr = $$("#bizAddr");
+
+    const custName = $$("#custName");
+    const jobAddr  = $$("#jobAddr");
+    const invNo    = $$("#invNo");
+    const invDate  = $$("#invDate");
+    const notes    = $$("#notes");
+
+    const svcPicker = $$("#svcPicker");
+    const svcTbody  = $$("#svcTableBody");
+
+    const laborRate  = $$("#laborRate");
+    const laborHours = $$("#laborHours");
+    const overheadPct= $$("#overheadPct");
+    const profitPct  = $$("#profitPct");
+    const minJob     = $$("#minJob");
+    const discount   = $$("#discount");
+
+    // NEW add-ons inputs + switches
+    const swEquip = $$("#swEquip");
+    const swMaterials = $$("#swMaterials");
+    const swDisposal = $$("#swDisposal");
+    const swTravel = $$("#swTravel");
+    const equipFee = $$("#equipFee");
+    const materialsFee = $$("#materialsFee");
+    const disposalFee = $$("#disposalFee");
+    const travelFee = $$("#travelFee");
+
+    const tServices = $$("#tServices");
+    const tServicesMeta = $$("#tServicesMeta");
+    const tLabor = $$("#tLabor");
+    const tLaborMeta = $$("#tLaborMeta");
+
+    const tEquip = $$("#tEquip");
+    const tEquipMeta = $$("#tEquipMeta");
+    const tMaterials = $$("#tMaterials");
+    const tMaterialsMeta = $$("#tMaterialsMeta");
+    const tDisposal = $$("#tDisposal");
+    const tDisposalMeta = $$("#tDisposalMeta");
+    const tTravel = $$("#tTravel");
+    const tTravelMeta = $$("#tTravelMeta");
+
+    const tOverhead = $$("#tOverhead");
+    const tOverheadMeta = $$("#tOverheadMeta");
+    const tProfit = $$("#tProfit");
+    const tProfitMeta = $$("#tProfitMeta");
+    const tDiscount = $$("#tDiscount");
+    const tDiscountMeta = $$("#tDiscountMeta");
+    const tGrand = $$("#tGrand");
+    const tGrandMeta = $$("#tGrandMeta");
+
+    function buildServicePicker(){
+      while (svcPicker.options.length > 1) svcPicker.remove(1);
+      const lang = state.lang || "en";
+      SERVICE_CATALOG.forEach(s => {
+        const opt = document.createElement("option");
+        opt.value = s.key;
+        opt.textContent = `${s[lang].name} (${s[lang].unit})`;
+        svcPicker.appendChild(opt);
+      });
+    }
+
+    function renderBusinessHeader(){
+      const name = (state.business?.name || "").trim();
+      const phone = (state.business?.phone || "").trim();
+      const addr = (state.business?.address || "").trim();
+
+      hdrBizName.textContent = name || t("hdr_default");
+      hdrBizLine.textContent = [phone, addr].filter(Boolean).join(" • ") || t("hdr_enter_biz");
+
+      document.title = name ? `${name} — ${t("hdr_default")}` : t("hdr_default");
+      document.documentElement.lang = (state.lang === "es") ? "es" : "en";
+    }
+
+    function renderServices(){
+      svcTbody.innerHTML = "";
+      if (!state.services.length){
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td colspan="6" class="muted">${(state.lang==="es") ? "Aún no hay servicios. Usa “Agregar servicio” arriba." : "No services added yet. Use “Add service” above."}</td>`;
+        svcTbody.appendChild(tr);
+        return;
+      }
+
+      state.services.forEach((line, idx) => {
+        const lineTotal = clampNonNeg(line.qty) * clampNonNeg(line.unitPrice);
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td data-label="${t("dl_service")}">
+            <div style="font-weight:600;">${line.name}</div>
+            <div class="muted" style="font-size:12px;">${line.unit}</div>
+          </td>
+          <td data-label="${t("dl_unit")}">${line.unit}</td>
+          <td data-label="${t("dl_qty")}">
+            <div class="qtyBox">
+              <input data-idx="${idx}" data-field="qty" type="text" inputmode="decimal" value="${isFinite(line.qty)?line.qty:""}" />
+            </div>
+          </td>
+          <td data-label="${t("dl_unitprice")}" class="right">
+            <input data-idx="${idx}" data-field="unitPrice" type="text" inputmode="decimal" value="${isFinite(line.unitPrice)?toFixed2(line.unitPrice):""}" />
+          </td>
+          <td data-label="${t("dl_line")}" class="right" data-field="lineTotal">${money(lineTotal)}</td>
+          <td data-label="${t("dl_remove")}" class="right">
+            <button class="btn small danger" data-action="remove" data-idx="${idx}">${t("btn_remove")}</button>
+          </td>
+        `;
+        svcTbody.appendChild(tr);
+      });
+
+      svcTbody.querySelectorAll("input[data-field='qty']").forEach(inp => {
+        inp.addEventListener("input", () => {
+          const idx = Number(inp.dataset.idx);
+          const n = parseNumLoose(inp.value);
+          state.services[idx].qty = isFinite(n) ? n : 0;
+          autosave();
+        });
+        inp.addEventListener("blur", () => { renderServices(); recalc(); autosave(); });
+      });
+
+      svcTbody.querySelectorAll("input[data-field='unitPrice']").forEach(inp => {
+        inp.addEventListener("input", () => {
+          const idx = Number(inp.dataset.idx);
+          const n = parseNumLoose(inp.value);
+          state.services[idx].unitPrice = isFinite(n) ? n : 0;
+          autosave();
+        });
+        inp.addEventListener("blur", () => { renderServices(); recalc(); autosave(); });
+      });
+
+      svcTbody.querySelectorAll("button[data-action='remove']").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const idx = Number(btn.dataset.idx);
+          state.services.splice(idx, 1);
+          renderServices(); recalc(); autosave();
+        });
+      });
+    }
+
+    function setSwitch(el, on){
+      el.classList.toggle("on", !!on);
+      el.setAttribute("aria-checked", (!!on).toString());
+    }
+    function setAddonEnabled(which, on){
+      const s = state.settings;
+      if(which==="equip"){ s.equipOn = !!on; setSwitch(swEquip, s.equipOn); equipFee.classList.toggle("amtOff", !s.equipOn); }
+      if(which==="materials"){ s.materialsOn = !!on; setSwitch(swMaterials, s.materialsOn); materialsFee.classList.toggle("amtOff", !s.materialsOn); }
+      if(which==="disposal"){ s.disposalOn = !!on; setSwitch(swDisposal, s.disposalOn); disposalFee.classList.toggle("amtOff", !s.disposalOn); }
+      if(which==="travel"){ s.travelOn = !!on; setSwitch(swTravel, s.travelOn); travelFee.classList.toggle("amtOff", !s.travelOn); }
+      recalc(); autosave();
+    }
+
+    function recalc(){
+      const servicesSubtotal = state.services.reduce((sum, l) => sum + (clampNonNeg(l.qty) * clampNonNeg(l.unitPrice)), 0);
+      const laborTotal = clampNonNeg(state.settings.laborRate) * clampNonNeg(state.settings.laborHours);
+
+      const equipTotal = state.settings.equipOn ? clampNonNeg(state.settings.equipFee) : 0;
+      const materialsTotal = state.settings.materialsOn ? clampNonNeg(state.settings.materialsFee) : 0;
+      const disposalTotal = state.settings.disposalOn ? clampNonNeg(state.settings.disposalFee) : 0;
+      const travelTotal = state.settings.travelOn ? clampNonNeg(state.settings.travelFee) : 0;
+
+      // base before overhead/profit
+      const base = servicesSubtotal + laborTotal + equipTotal + materialsTotal + disposalTotal + travelTotal;
+
+      const overheadTotal = base * (clampNonNeg(state.settings.overheadPct)/100);
+      const profitTotal = base * (clampNonNeg(state.settings.profitPct)/100);
+      const disc = clampNonNeg(state.settings.discount);
+
+      let grand = base + overheadTotal + profitTotal - disc;
+      const minFee = clampNonNeg(state.settings.minJob);
+      const bumped = (minFee>0 && grand<minFee);
+      if (bumped) grand = minFee;
+
+      tServices.textContent = money(servicesSubtotal);
+      tServicesMeta.textContent = state.services.length ? `${state.services.length} item(s)` : "";
+
+      tLabor.textContent = money(laborTotal);
+      tLaborMeta.textContent = `${clampNonNeg(state.settings.laborHours)} hr × ${money(clampNonNeg(state.settings.laborRate))}/hr`;
+
+      tEquip.textContent = money(equipTotal);
+      tEquipMeta.textContent = state.settings.equipOn ? "On" : "Off";
+
+      tMaterials.textContent = money(materialsTotal);
+      tMaterialsMeta.textContent = state.settings.materialsOn ? "On" : "Off";
+
+      tDisposal.textContent = money(disposalTotal);
+      tDisposalMeta.textContent = state.settings.disposalOn ? "On" : "Off";
+
+      tTravel.textContent = money(travelTotal);
+      tTravelMeta.textContent = state.settings.travelOn ? "On" : "Off";
+
+      // bilingual meta labels
+      if(state.lang==="es"){
+        tEquipMeta.textContent = state.settings.equipOn ? "Activo" : "Apagado";
+        tMaterialsMeta.textContent = state.settings.materialsOn ? "Activo" : "Apagado";
+        tDisposalMeta.textContent = state.settings.disposalOn ? "Activo" : "Apagado";
+        tTravelMeta.textContent = state.settings.travelOn ? "Activo" : "Apagado";
+      }
+
+      tOverhead.textContent = money(overheadTotal);
+      tOverheadMeta.textContent = `${clampNonNeg(state.settings.overheadPct)}%`;
+
+      tProfit.textContent = money(profitTotal);
+      tProfitMeta.textContent = `${clampNonNeg(state.settings.profitPct)}%`;
+
+      tDiscount.textContent = money(disc);
+      tDiscountMeta.textContent = disc>0 ? (state.lang==="es" ? "Aplicado" : "Applied") : "—";
+
+      tGrand.textContent = money(grand);
+      tGrandMeta.textContent = bumped
+        ? (state.lang==="es" ? `Se aplicó mínimo (${money(minFee)})` : `Minimum fee applied (${money(minFee)})`)
+        : "—";
+    }
+
+    function addSelectedService(){
+      const key = svcPicker.value;
+      if (!key){ toast(t("toast_pick_service")); return; }
+      const def = SERVICE_CATALOG.find(s => s.key === key);
+      const lang = state.lang || "en";
+      state.services.push({
+        key: def.key,
+        name: def[lang].name,
+        unit: def[lang].unit,
+        qty: 1,
+        unitPrice: 0
+      });
+      svcPicker.value = "";
+      renderServices(); recalc(); autosave();
+    }
+
+    function syncStateFromForm(){
+      state.business.name = bizName.value || "";
+      state.business.phone = bizPhone.value || "";
+      state.business.address = bizAddr.value || "";
+      state.meta.custName = custName.value || "";
+      state.meta.jobAddr  = jobAddr.value || "";
+      state.meta.invNo    = invNo.value || "";
+      state.meta.invDate  = invDate.value || "";
+      state.meta.notes    = notes.value || "";
+    }
+
+    function syncFormFromState(){
+      bizName.value = state.business?.name || "";
+      bizPhone.value = state.business?.phone || "";
+      bizAddr.value = state.business?.address || "";
+      custName.value = state.meta.custName || "";
+      jobAddr.value  = state.meta.jobAddr || "";
+      invNo.value    = state.meta.invNo || "";
+      invDate.value  = state.meta.invDate || todayStr();
+      notes.value    = state.meta.notes || "";
+
+      // placeholders by language
+      bizName.placeholder = t("ph_bizname");
+      bizPhone.placeholder = t("ph_bizphone");
+      bizAddr.placeholder = t("ph_bizaddr");
+      custName.placeholder = t("ph_custname");
+      jobAddr.placeholder = t("ph_jobaddr");
+      invNo.placeholder = t("ph_invno");
+      notes.placeholder = t("ph_notes");
+
+      laborRate.value   = state.settings.laborRate===0 ? "" : toFixed2(state.settings.laborRate);
+      laborHours.value  = state.settings.laborHours===0 ? "" : String(state.settings.laborHours);
+      overheadPct.value = state.settings.overheadPct===0 ? "" : String(state.settings.overheadPct);
+      profitPct.value   = state.settings.profitPct===0 ? "" : String(state.settings.profitPct);
+      minJob.value      = state.settings.minJob===0 ? "" : toFixed2(state.settings.minJob);
+      discount.value    = state.settings.discount===0 ? "" : toFixed2(state.settings.discount);
+
+      // NEW add-ons
+      equipFee.value = state.settings.equipFee===0 ? "" : toFixed2(state.settings.equipFee);
+      materialsFee.value = state.settings.materialsFee===0 ? "" : toFixed2(state.settings.materialsFee);
+      disposalFee.value = state.settings.disposalFee===0 ? "" : toFixed2(state.settings.disposalFee);
+      travelFee.value = state.settings.travelFee===0 ? "" : toFixed2(state.settings.travelFee);
+
+      setSwitch(swEquip, !!state.settings.equipOn);
+      setSwitch(swMaterials, !!state.settings.materialsOn);
+      setSwitch(swDisposal, !!state.settings.disposalOn);
+      setSwitch(swTravel, !!state.settings.travelOn);
+
+      equipFee.classList.toggle("amtOff", !state.settings.equipOn);
+      materialsFee.classList.toggle("amtOff", !state.settings.materialsOn);
+      disposalFee.classList.toggle("amtOff", !state.settings.disposalOn);
+      travelFee.classList.toggle("amtOff", !state.settings.travelOn);
+    }
+
+    const LS_KEY = "anchored_landscaping_invoice_v1_bilingual";
+    function autosave(){ try{ localStorage.setItem(LS_KEY, JSON.stringify(state)); }catch(e){} }
+    function loadSaved(){
+      try{
+        const raw = localStorage.getItem(LS_KEY);
+        if(!raw) return false;
+        const obj = JSON.parse(raw);
+        if(!obj || !obj.settings || !obj.meta || !Array.isArray(obj.services)) return false;
+
+        // merge safely (adds new fields if user saved old version)
+        const base = DEFAULT_STATE();
+        state = Object.assign(base, obj);
+        state.settings = Object.assign(base.settings, obj.settings || {});
+        state.business = Object.assign(base.business, obj.business || {});
+        state.meta = Object.assign(base.meta, obj.meta || {});
+
+        state.lang = (state.lang === "es") ? "es" : "en";
+        return true;
+      }catch(e){ return false; }
+    }
+
+    function copySummary(){
+      const b = state.business || {};
+      const lines = [];
+      lines.push((b.name||"").trim() || t("hdr_default"));
+      const bizLine = [b.phone,b.address].filter(Boolean).join(" • ");
+      if(bizLine) lines.push(bizLine);
+      lines.push("");
+      lines.push(`${t("hdr_default")} ${state.meta.invNo||""}`.trim());
+      lines.push(`${t("lab_date")}: ${state.meta.invDate||""}`.trim());
+      lines.push(`${t("lab_custname")}: ${state.meta.custName||""}`.trim());
+      lines.push(`${t("lab_jobaddr")}: ${state.meta.jobAddr||""}`.trim());
+      lines.push("");
+
+      lines.push(`${t("left_title")}:`);
+      if(!state.services.length) lines.push("- (none)");
+      state.services.forEach(s=>{
+        const lt = clampNonNeg(s.qty)*clampNonNeg(s.unitPrice);
+        lines.push(`- ${s.name}: ${s.qty} ${s.unit} @ ${money(s.unitPrice)} = ${money(lt)}`);
+      });
+
+      lines.push("");
+      lines.push(`${t("k_labor")}: ${$$("#tLabor").textContent}`);
+
+      // add-ons summary (only when enabled)
+      if(state.settings.equipOn) lines.push(`${t("k_equip")}: ${$$("#tEquip").textContent}`);
+      if(state.settings.materialsOn) lines.push(`${t("k_materials")}: ${$$("#tMaterials").textContent}`);
+      if(state.settings.disposalOn) lines.push(`${t("k_disposal")}: ${$$("#tDisposal").textContent}`);
+      if(state.settings.travelOn) lines.push(`${t("k_travel")}: ${$$("#tTravel").textContent}`);
+
+      lines.push(`${t("k_overhead")}: ${$$("#tOverhead").textContent}`);
+      lines.push(`${t("k_profit")}: ${$$("#tProfit").textContent}`);
+      if(clampNonNeg(state.settings.discount)>0) lines.push(`${t("k_discount")}: ${$$("#tDiscount").textContent}`);
+      lines.push("");
+      lines.push(`${t("k_total")}: ${$$("#tGrand").textContent}`);
+
+      if(state.meta.notes){ lines.push(""); lines.push(`${t("lab_notes")}:`); lines.push(state.meta.notes); }
+
+      navigator.clipboard.writeText(lines.join("\n"))
+        .then(()=>toast(t("toast_copy_ok")))
+        .catch(()=>toast(t("toast_copy_fail")));
+    }
+
+    function exportJSON(){
+      const blob = new Blob([JSON.stringify(state,null,2)],{type:"application/json"});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href=url;
+      a.download=`invoice_${(state.meta.invNo||"export").replaceAll(" ","_")}.json`;
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(()=>URL.revokeObjectURL(url),1000);
+    }
+
+    function importJSON(){
+      const inp=document.createElement("input");
+      inp.type="file"; inp.accept="application/json";
+      inp.addEventListener("change", async ()=>{
+        const f=inp.files&&inp.files[0]; if(!f) return;
+        try{
+          const txt=await f.text();
+          const obj=JSON.parse(txt);
+          if(!obj || !obj.settings || !obj.meta || !Array.isArray(obj.services)) throw 0;
+
+          const base = DEFAULT_STATE();
+          state = Object.assign(base, obj);
+          state.settings = Object.assign(base.settings, obj.settings || {});
+          state.business = Object.assign(base.business, obj.business || {});
+          state.meta = Object.assign(base.meta, obj.meta || {});
+          state.lang = (state.lang === "es") ? "es" : "en";
+
+          syncFormFromState();
+          applyLanguage(state.lang, true);
+          renderBusinessHeader();
+          renderServices();
+          recalc();
+          autosave();
+          toast(t("toast_import_ok"));
+        }catch(e){ toast(t("toast_import_fail")); }
+      });
+      inp.click();
+    }
+
+    function loadSample(){
+      state = DEFAULT_STATE();
+      state.lang = langSel.value || "en";
+      state.meta.custName = (state.lang==="es") ? "Cliente de ejemplo" : "Sample Customer";
+      state.meta.jobAddr  = (state.lang==="es") ? "999 Calle Ejemplo, Saint Joseph, IL" : "999 Example Rd, Saint Joseph, IL";
+      state.meta.invNo    = "AL-0001";
+      state.meta.invDate  = todayStr();
+      state.services = [];
+
+      const s1 = SERVICE_CATALOG.find(x=>x.key==="mowing");
+      const s2 = SERVICE_CATALOG.find(x=>x.key==="trimming");
+      state.services.push({ key:s1.key, name:s1[state.lang].name, unit:s1[state.lang].unit, qty:1, unitPrice:55 });
+      state.services.push({ key:s2.key, name:s2[state.lang].name, unit:s2[state.lang].unit, qty:1, unitPrice:35 });
+
+      // sample add-ons (kept small)
+      state.settings.travelOn = true;
+      state.settings.travelFee = 25;
+
+      syncFormFromState();
+      applyLanguage(state.lang, true);
+      renderBusinessHeader();
+      renderServices();
+      recalc();
+      autosave();
+      toast(t("toast_sample"));
+    }
+
+    function resetAll(){
+      const keepLang = state.lang || "en";
+      state = DEFAULT_STATE();
+      state.lang = keepLang;
+
+      syncFormFromState();
+      applyLanguage(state.lang, true);
+      renderBusinessHeader();
+      renderServices();
+      recalc();
+      autosave();
+      toast(t("toast_reset"));
+    }
+
+    function applyLanguage(lang, silent){
+      state.lang = (lang === "es") ? "es" : "en";
+      langSel.value = state.lang;
+
+      document.querySelectorAll("[data-i18n]").forEach(el => {
+        const key = el.getAttribute("data-i18n");
+        if (!key) return;
+        el.textContent = t(key);
+      });
+
+      syncFormFromState();
+      buildServicePicker();
+
+      renderBusinessHeader();
+      renderServices();
+      recalc();
+      autosave();
+      if (!silent) toast(state.lang === "es" ? "Idioma: Español" : "Language: English");
+    }
+
+    function wireInputs(){
+      [bizName,bizPhone,bizAddr,custName,jobAddr,invNo,invDate,notes].forEach(el=>{
+        el.addEventListener("input", ()=>{ syncStateFromForm(); renderBusinessHeader(); recalc(); autosave(); });
+      });
+
+      bindMoneyInput(laborRate,()=>0,(v)=>state.settings.laborRate=v);
+      bindNumberInput(laborHours,()=>0,(v)=>state.settings.laborHours=v);
+      bindNumberInput(overheadPct,()=>0,(v)=>state.settings.overheadPct=v);
+      bindNumberInput(profitPct,()=>0,(v)=>state.settings.profitPct=v);
+      bindMoneyInput(minJob,()=>0,(v)=>state.settings.minJob=v);
+      bindMoneyInput(discount,()=>0,(v)=>state.settings.discount=v);
+
+      // NEW add-on money inputs (only count when toggle is ON)
+      bindMoneyInput(equipFee,()=>0,(v)=>state.settings.equipFee=v);
+      bindMoneyInput(materialsFee,()=>0,(v)=>state.settings.materialsFee=v);
+      bindMoneyInput(disposalFee,()=>0,(v)=>state.settings.disposalFee=v);
+      bindMoneyInput(travelFee,()=>0,(v)=>state.settings.travelFee=v);
+
+      // Switch toggles (click + keyboard)
+      const wireSwitch = (el, which) => {
+        const toggle = ()=> setAddonEnabled(which, !(
+          which==="equip" ? state.settings.equipOn :
+          which==="materials" ? state.settings.materialsOn :
+          which==="disposal" ? state.settings.disposalOn :
+          state.settings.travelOn
+        ));
+        el.addEventListener("click", toggle);
+        el.addEventListener("keydown", (e)=>{ if(e.key==="Enter" || e.key===" "){ e.preventDefault(); toggle(); } });
+      };
+      wireSwitch(swEquip, "equip");
+      wireSwitch(swMaterials, "materials");
+      wireSwitch(swDisposal, "disposal");
+      wireSwitch(swTravel, "travel");
+
+      $$("#btnAddSvc").addEventListener("click", addSelectedService);
+      $$("#btnSave").addEventListener("click", ()=>{ syncStateFromForm(); autosave(); toast(t("toast_saved")); });
+      $$("#btnSample").addEventListener("click", loadSample);
+      $$("#btnReset").addEventListener("click", resetAll);
+      $$("#btnCopyText").addEventListener("click", copySummary);
+      $$("#btnPrint").addEventListener("click", ()=>window.print());
+      $$("#btnExport").addEventListener("click", exportJSON);
+      $$("#btnImport").addEventListener("click", importJSON);
+
+      langSel.addEventListener("change", () => applyLanguage(langSel.value));
+    }
+
+    function init(){
+      buildServicePicker();
+
+      if(!loadSaved()) state = DEFAULT_STATE();
+      if(!state.meta.invDate) state.meta.invDate = todayStr();
+
+      langSel.value = state.lang || "en";
+
+      syncFormFromState();
+      applyLanguage(state.lang || "en", true);
+      renderBusinessHeader();
+      renderServices();
+      recalc();
+      wireInputs();
+    }
+
+    init();
+  </script>
+
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("./sw.js").catch(console.error);
+      });
+    }
+  </script>
+</body>
+</html>
