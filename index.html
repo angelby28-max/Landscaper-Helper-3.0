@@ -136,6 +136,20 @@
     .svcAdd{ display:flex; gap:10px; align-items:end; flex-wrap:wrap; }
     .svcAdd > div{ flex: 1 1 260px; }
 
+    .svcCustomGrid{
+      display:grid;
+      grid-template-columns: 1.3fr .9fr .7fr auto;
+      gap:10px;
+      align-items:end;
+      margin-top:12px;
+    }
+    @media (max-width: 820px){
+      .svcCustomGrid{ grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 560px){
+      .svcCustomGrid{ grid-template-columns: 1fr; }
+    }
+
     table{
       width:100%;
       border-collapse:collapse;
@@ -392,6 +406,22 @@
             <button class="btn primary" id="btnAddSvc" data-i18n="btn_add">Add</button>
           </div>
 
+          <div class="svcCustomGrid">
+            <div>
+              <label data-i18n="lab_custom_job">Custom job name</label>
+              <input id="customSvcName" type="text" />
+            </div>
+            <div>
+              <label data-i18n="lab_custom_unit">Custom unit</label>
+              <input id="customSvcUnit" type="text" />
+            </div>
+            <div>
+              <label data-i18n="lab_custom_price">Starting unit $</label>
+              <input id="customSvcPrice" type="text" inputmode="decimal" />
+            </div>
+            <button class="btn" id="btnAddCustomSvc" data-i18n="btn_add_custom">Add custom</button>
+          </div>
+
           <div style="margin-top:12px;">
             <table>
               <thead>
@@ -587,6 +617,7 @@
         btn_sample: "Load sample",
         btn_save: "Save",
         btn_add: "Add",
+        btn_add_custom: "Add custom",
         btn_copy: "Copy summary",
         btn_print: "Print / Save PDF",
         btn_export: "Export JSON",
@@ -613,6 +644,13 @@
         lab_addsvc: "Add service",
         svc_select: "Select a service…",
         hint_mobile_cards: "On phones, services become stacked “cards” so inputs stay visible.",
+
+        lab_custom_job: "Custom job name",
+        ph_custom_job: "Ex: Metal edging install",
+        lab_custom_unit: "Custom unit",
+        ph_custom_unit: "Ex: linear ft",
+        lab_custom_price: "Starting unit $",
+        ph_custom_price: "0.00",
 
         th_service: "Service",
         th_unit: "Unit",
@@ -665,6 +703,8 @@
         hdr_default: "Invoice / Quote",
         hdr_enter_biz: "Enter your business info above.",
         toast_pick_service: "Pick a service first.",
+        toast_pick_custom_name: "Enter a custom job name first.",
+        toast_custom_added: "Custom job added.",
         toast_saved: "Saved.",
         toast_sample: "Sample loaded.",
         toast_reset: "Reset done.",
@@ -685,6 +725,7 @@
         btn_sample: "Cargar ejemplo",
         btn_save: "Guardar",
         btn_add: "Agregar",
+        btn_add_custom: "Agregar personalizado",
         btn_copy: "Copiar resumen",
         btn_print: "Imprimir / Guardar PDF",
         btn_export: "Exportar JSON",
@@ -711,6 +752,13 @@
         lab_addsvc: "Agregar servicio",
         svc_select: "Selecciona un servicio…",
         hint_mobile_cards: "En el teléfono, los servicios se muestran como “tarjetas” para que los campos se vean al escribir.",
+
+        lab_custom_job: "Nombre de trabajo personalizado",
+        ph_custom_job: "Ej: Instalación de borde metálico",
+        lab_custom_unit: "Unidad personalizada",
+        ph_custom_unit: "Ej: pie lineal",
+        lab_custom_price: "Precio unitario inicial",
+        ph_custom_price: "0.00",
 
         th_service: "Servicio",
         th_unit: "Unidad",
@@ -763,6 +811,8 @@
         hdr_default: "Factura / Cotización",
         hdr_enter_biz: "Ingresa la información de tu negocio arriba.",
         toast_pick_service: "Primero selecciona un servicio.",
+        toast_pick_custom_name: "Primero escribe un nombre de trabajo personalizado.",
+        toast_custom_added: "Trabajo personalizado agregado.",
         toast_saved: "Guardado.",
         toast_sample: "Ejemplo cargado.",
         toast_reset: "Restablecido.",
@@ -879,6 +929,10 @@
 
     const svcPicker = $$("#svcPicker");
     const svcTbody  = $$("#svcTableBody");
+
+    const customSvcName = $$("#customSvcName");
+    const customSvcUnit = $$("#customSvcUnit");
+    const customSvcPrice = $$("#customSvcPrice");
 
     const laborRate  = $$("#laborRate");
     const laborHours = $$("#laborHours");
@@ -1096,6 +1150,39 @@
       renderServices(); recalc(); autosave();
     }
 
+    function addCustomService(){
+      const rawName = (customSvcName.value || "").trim();
+      const rawUnit = (customSvcUnit.value || "").trim();
+      const rawPrice = parseNumLoose(customSvcPrice.value);
+
+      if(!rawName){
+        toast(t("toast_pick_custom_name"));
+        customSvcName.focus();
+        return;
+      }
+
+      const unit = rawUnit || (state.lang === "es" ? "fijo" : "flat");
+      const unitPrice = isFinite(rawPrice) ? Math.max(0, rawPrice) : 0;
+
+      state.services.push({
+        key: "custom",
+        name: rawName,
+        unit: unit,
+        qty: 1,
+        unitPrice: unitPrice
+      });
+
+      customSvcName.value = "";
+      customSvcUnit.value = "";
+      customSvcPrice.value = "";
+
+      renderServices();
+      recalc();
+      autosave();
+      toast(t("toast_custom_added"));
+      customSvcName.focus();
+    }
+
     function syncStateFromForm(){
       state.business.name = bizName.value || "";
       state.business.phone = bizPhone.value || "";
@@ -1124,6 +1211,10 @@
       jobAddr.placeholder = t("ph_jobaddr");
       invNo.placeholder = t("ph_invno");
       notes.placeholder = t("ph_notes");
+
+      customSvcName.placeholder = t("ph_custom_job");
+      customSvcUnit.placeholder = t("ph_custom_unit");
+      customSvcPrice.placeholder = t("ph_custom_price");
 
       laborRate.value   = state.settings.laborRate===0 ? "" : toFixed2(state.settings.laborRate);
       laborHours.value  = state.settings.laborHours===0 ? "" : String(state.settings.laborHours);
@@ -1341,6 +1432,17 @@
       wireSwitch(swTravel, "travel");
 
       $$("#btnAddSvc").addEventListener("click", addSelectedService);
+      $$("#btnAddCustomSvc").addEventListener("click", addCustomService);
+
+      [customSvcName, customSvcUnit, customSvcPrice].forEach(el => {
+        el.addEventListener("keydown", (e) => {
+          if(e.key === "Enter"){
+            e.preventDefault();
+            addCustomService();
+          }
+        });
+      });
+
       $$("#btnSave").addEventListener("click", ()=>{ syncStateFromForm(); autosave(); toast(t("toast_saved")); });
       $$("#btnSample").addEventListener("click", loadSample);
       $$("#btnReset").addEventListener("click", resetAll);
