@@ -150,6 +150,12 @@
       .svcCustomGrid{ grid-template-columns: 1fr; }
     }
 
+    .sectionActions{
+      display:flex;
+      justify-content:flex-end;
+      margin:-2px 0 10px;
+    }
+
     table{
       width:100%;
       border-collapse:collapse;
@@ -338,12 +344,16 @@
         <div class="hd">
           <h2 data-i18n="left_title">Job details & services</h2>
           <div class="split">
-            <button class="btn small" id="btnReset" data-i18n="btn_reset">Reset</button>
+            <button class="btn small" id="btnNewJob" data-i18n="btn_new_job">New Job</button>
             <button class="btn small" id="btnSample" data-i18n="btn_sample">Load sample</button>
             <button class="btn small" id="btnSave" data-i18n="btn_save">Save</button>
           </div>
         </div>
         <div class="bd">
+          <div class="sectionActions">
+            <button class="btn small danger" id="btnClearBusiness" data-i18n="btn_clear_business">Clear Business Info</button>
+          </div>
+
           <div class="row">
             <div>
               <label data-i18n="lab_bizname">Business name</label>
@@ -613,7 +623,8 @@
         left_title: "Job details & services",
         right_title: "Pricing settings & totals",
 
-        btn_reset: "Reset",
+        btn_new_job: "New Job",
+        btn_clear_business: "Clear Business Info",
         btn_sample: "Load sample",
         btn_save: "Save",
         btn_add: "Add",
@@ -707,7 +718,8 @@
         toast_custom_added: "Custom job added.",
         toast_saved: "Saved.",
         toast_sample: "Sample loaded.",
-        toast_reset: "Reset done.",
+        toast_new_job: "New job started.",
+        toast_clear_business: "Business info cleared.",
         toast_copy_ok: "Summary copied.",
         toast_copy_fail: "Copy failed.",
         toast_import_ok: "Imported.",
@@ -721,7 +733,8 @@
         left_title: "Detalles del trabajo y servicios",
         right_title: "Ajustes de precios y totales",
 
-        btn_reset: "Restablecer",
+        btn_new_job: "Nuevo trabajo",
+        btn_clear_business: "Borrar datos del negocio",
         btn_sample: "Cargar ejemplo",
         btn_save: "Guardar",
         btn_add: "Agregar",
@@ -815,7 +828,8 @@
         toast_custom_added: "Trabajo personalizado agregado.",
         toast_saved: "Guardado.",
         toast_sample: "Ejemplo cargado.",
-        toast_reset: "Restablecido.",
+        toast_new_job: "Nuevo trabajo iniciado.",
+        toast_clear_business: "Datos del negocio borrados.",
         toast_copy_ok: "Resumen copiado.",
         toast_copy_fail: "No se pudo copiar.",
         toast_import_ok: "Importado.",
@@ -1340,8 +1354,10 @@
     }
 
     function loadSample(){
+      const keepBusiness = { ...state.business };
       state = DEFAULT_STATE();
       state.lang = langSel.value || "en";
+      state.business = keepBusiness;
       state.meta.custName = (state.lang==="es") ? "Cliente de ejemplo" : "Sample Customer";
       state.meta.jobAddr  = (state.lang==="es") ? "999 Calle Ejemplo, Saint Joseph, IL" : "999 Example Rd, Saint Joseph, IL";
       state.meta.invNo    = "AL-0001";
@@ -1356,6 +1372,10 @@
       state.settings.travelOn = true;
       state.settings.travelFee = 25;
 
+      customSvcName.value = "";
+      customSvcUnit.value = "";
+      customSvcPrice.value = "";
+
       syncFormFromState();
       applyLanguage(state.lang, true);
       renderBusinessHeader();
@@ -1365,10 +1385,18 @@
       toast(t("toast_sample"));
     }
 
-    function resetAll(){
+    function newJob(){
       const keepLang = state.lang || "en";
+      const keepBusiness = { ...state.business };
+
       state = DEFAULT_STATE();
       state.lang = keepLang;
+      state.business = keepBusiness;
+      state.meta.invDate = todayStr();
+
+      customSvcName.value = "";
+      customSvcUnit.value = "";
+      customSvcPrice.value = "";
 
       syncFormFromState();
       applyLanguage(state.lang, true);
@@ -1376,7 +1404,17 @@
       renderServices();
       recalc();
       autosave();
-      toast(t("toast_reset"));
+      toast(t("toast_new_job"));
+    }
+
+    function clearBusinessInfo(){
+      state.business = { name:"", phone:"", address:"" };
+      bizName.value = "";
+      bizPhone.value = "";
+      bizAddr.value = "";
+      renderBusinessHeader();
+      autosave();
+      toast(t("toast_clear_business"));
     }
 
     function applyLanguage(lang, silent){
@@ -1445,7 +1483,8 @@
 
       $$("#btnSave").addEventListener("click", ()=>{ syncStateFromForm(); autosave(); toast(t("toast_saved")); });
       $$("#btnSample").addEventListener("click", loadSample);
-      $$("#btnReset").addEventListener("click", resetAll);
+      $$("#btnNewJob").addEventListener("click", newJob);
+      $$("#btnClearBusiness").addEventListener("click", clearBusinessInfo);
       $$("#btnCopyText").addEventListener("click", copySummary);
       $$("#btnPrint").addEventListener("click", ()=>window.print());
       $$("#btnExport").addEventListener("click", exportJSON);
