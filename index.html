@@ -101,7 +101,7 @@
       border-radius:12px;
       padding:10px 12px;
       outline:none;
-      font-size:16px; /* iOS: prevents zoom + improves visibility */
+      font-size:16px;
     }
     textarea{ min-height:84px; resize:vertical; }
 
@@ -163,7 +163,6 @@
       touch-action:manipulation;
     }
 
-    /* Mobile stacked service rows */
     @media (max-width: 620px){
       thead{ display:none; }
       table, tbody, tr, td{ display:block; width:100%; }
@@ -207,7 +206,6 @@
     }
     .toast.show{ display:block; }
 
-    /* Add-ons (collapsible) */
     details.accordion{
       border:1px solid var(--line);
       border-radius:12px;
@@ -322,7 +320,6 @@
     </div>
 
     <div class="grid">
-      <!-- LEFT -->
       <div class="card">
         <div class="hd">
           <h2 data-i18n="left_title">Job details & services</h2>
@@ -403,7 +400,7 @@
                   <th style="width:18%;" data-i18n="th_unit">Unit</th>
                   <th style="width:18%;" data-i18n="th_qty">Qty</th>
                   <th style="width:18%;" class="right" data-i18n="th_unitprice">Unit $</th>
-                  <th style="width:12%;" class="right" data-i18n="th_line">Line $</th>
+                  <th style="width:18%;" class="right" data-i18n="th_line">Line $</th>
                   <th style="width:1%;"></th>
                 </tr>
               </thead>
@@ -413,7 +410,6 @@
         </div>
       </div>
 
-      <!-- RIGHT -->
       <div class="card">
         <div class="hd">
           <h2 data-i18n="right_title">Pricing settings & totals</h2>
@@ -453,7 +449,6 @@
             </div>
           </div>
 
-          <!-- ADD-ONS (collapsible, clean) -->
           <details class="accordion" id="addonsBox">
             <summary>
               <div class="accTitle">
@@ -524,7 +519,6 @@
                 <div class="muted" id="tLaborMeta"></div>
               </div>
 
-              <!-- NEW ADD-ONS TOTALS -->
               <div class="lineItem">
                 <div><div class="k" data-i18n="k_equip">Equipment wear & tear</div><div class="v" id="tEquip">$0.00</div></div>
                 <div class="muted" id="tEquipMeta"></div>
@@ -802,7 +796,6 @@
         laborRate:0, laborHours:0,
         overheadPct:0, profitPct:0,
         minJob:0, discount:0,
-        // NEW add-ons (enabled toggles + amounts)
         equipOn:false, equipFee:0,
         materialsOn:false, materialsFee:0,
         disposalOn:false, disposalFee:0,
@@ -869,7 +862,6 @@
       });
     }
 
-    // DOM
     const langSel = $$("#langSel");
 
     const hdrBizName = $$("#hdrBizName");
@@ -895,7 +887,6 @@
     const minJob     = $$("#minJob");
     const discount   = $$("#discount");
 
-    // NEW add-ons inputs + switches
     const swEquip = $$("#swEquip");
     const swMaterials = $$("#swMaterials");
     const swDisposal = $$("#swDisposal");
@@ -1036,14 +1027,15 @@
       const disposalTotal = state.settings.disposalOn ? clampNonNeg(state.settings.disposalFee) : 0;
       const travelTotal = state.settings.travelOn ? clampNonNeg(state.settings.travelFee) : 0;
 
-      // base before overhead/profit
-      const base = servicesSubtotal + laborTotal + equipTotal + materialsTotal + disposalTotal + travelTotal;
+      const overheadBase = laborTotal + equipTotal + disposalTotal + travelTotal;
+      const subtotalBeforeMarkup = servicesSubtotal + laborTotal + equipTotal + materialsTotal + disposalTotal + travelTotal;
 
-      const overheadTotal = base * (clampNonNeg(state.settings.overheadPct)/100);
-      const profitTotal = base * (clampNonNeg(state.settings.profitPct)/100);
+      const overheadTotal = overheadBase * (clampNonNeg(state.settings.overheadPct)/100);
+      const profitBase = subtotalBeforeMarkup + overheadTotal;
+      const profitTotal = profitBase * (clampNonNeg(state.settings.profitPct)/100);
       const disc = clampNonNeg(state.settings.discount);
 
-      let grand = base + overheadTotal + profitTotal - disc;
+      let grand = subtotalBeforeMarkup + overheadTotal + profitTotal - disc;
       const minFee = clampNonNeg(state.settings.minJob);
       const bumped = (minFee>0 && grand<minFee);
       if (bumped) grand = minFee;
@@ -1066,7 +1058,6 @@
       tTravel.textContent = money(travelTotal);
       tTravelMeta.textContent = state.settings.travelOn ? "On" : "Off";
 
-      // bilingual meta labels
       if(state.lang==="es"){
         tEquipMeta.textContent = state.settings.equipOn ? "Activo" : "Apagado";
         tMaterialsMeta.textContent = state.settings.materialsOn ? "Activo" : "Apagado";
@@ -1126,7 +1117,6 @@
       invDate.value  = state.meta.invDate || todayStr();
       notes.value    = state.meta.notes || "";
 
-      // placeholders by language
       bizName.placeholder = t("ph_bizname");
       bizPhone.placeholder = t("ph_bizphone");
       bizAddr.placeholder = t("ph_bizaddr");
@@ -1142,7 +1132,6 @@
       minJob.value      = state.settings.minJob===0 ? "" : toFixed2(state.settings.minJob);
       discount.value    = state.settings.discount===0 ? "" : toFixed2(state.settings.discount);
 
-      // NEW add-ons
       equipFee.value = state.settings.equipFee===0 ? "" : toFixed2(state.settings.equipFee);
       materialsFee.value = state.settings.materialsFee===0 ? "" : toFixed2(state.settings.materialsFee);
       disposalFee.value = state.settings.disposalFee===0 ? "" : toFixed2(state.settings.disposalFee);
@@ -1168,7 +1157,6 @@
         const obj = JSON.parse(raw);
         if(!obj || !obj.settings || !obj.meta || !Array.isArray(obj.services)) return false;
 
-        // merge safely (adds new fields if user saved old version)
         const base = DEFAULT_STATE();
         state = Object.assign(base, obj);
         state.settings = Object.assign(base.settings, obj.settings || {});
@@ -1203,7 +1191,6 @@
       lines.push("");
       lines.push(`${t("k_labor")}: ${$$("#tLabor").textContent}`);
 
-      // add-ons summary (only when enabled)
       if(state.settings.equipOn) lines.push(`${t("k_equip")}: ${$$("#tEquip").textContent}`);
       if(state.settings.materialsOn) lines.push(`${t("k_materials")}: ${$$("#tMaterials").textContent}`);
       if(state.settings.disposalOn) lines.push(`${t("k_disposal")}: ${$$("#tDisposal").textContent}`);
@@ -1275,7 +1262,6 @@
       state.services.push({ key:s1.key, name:s1[state.lang].name, unit:s1[state.lang].unit, qty:1, unitPrice:55 });
       state.services.push({ key:s2.key, name:s2[state.lang].name, unit:s2[state.lang].unit, qty:1, unitPrice:35 });
 
-      // sample add-ons (kept small)
       state.settings.travelOn = true;
       state.settings.travelFee = 25;
 
@@ -1334,13 +1320,11 @@
       bindMoneyInput(minJob,()=>0,(v)=>state.settings.minJob=v);
       bindMoneyInput(discount,()=>0,(v)=>state.settings.discount=v);
 
-      // NEW add-on money inputs (only count when toggle is ON)
       bindMoneyInput(equipFee,()=>0,(v)=>state.settings.equipFee=v);
       bindMoneyInput(materialsFee,()=>0,(v)=>state.settings.materialsFee=v);
       bindMoneyInput(disposalFee,()=>0,(v)=>state.settings.disposalFee=v);
       bindMoneyInput(travelFee,()=>0,(v)=>state.settings.travelFee=v);
 
-      // Switch toggles (click + keyboard)
       const wireSwitch = (el, which) => {
         const toggle = ()=> setAddonEnabled(which, !(
           which==="equip" ? state.settings.equipOn :
