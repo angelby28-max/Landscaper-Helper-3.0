@@ -72,6 +72,8 @@
     .grid{ display:grid; grid-template-columns: 1.1fr .9fr; gap:14px; }
     @media (max-width: 980px){ .grid{ grid-template-columns: 1fr; } }
 
+    .stack{ display:grid; gap:14px; margin-top:14px; }
+
     .card{
       background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
       border:1px solid var(--line);
@@ -310,6 +312,62 @@
       opacity:.45;
       pointer-events:none;
     }
+
+    .convGrid{
+      display:grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap:14px;
+    }
+    @media (max-width: 980px){
+      .convGrid{ grid-template-columns: 1fr; }
+    }
+
+    .resultGrid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:10px;
+      margin-top:10px;
+    }
+    @media (max-width: 620px){
+      .resultGrid{ grid-template-columns: 1fr; }
+    }
+
+    .resultCard{
+      border:1px solid var(--line);
+      border-radius:12px;
+      padding:12px;
+      background:rgba(255,255,255,.02);
+    }
+    .resultCard .rk{
+      color:var(--muted);
+      font-size:12px;
+      margin-bottom:6px;
+    }
+    .resultCard .rv{
+      font-size:20px;
+      font-weight:700;
+    }
+
+    .modeRow{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-bottom:10px;
+    }
+    .modeBtn{
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.03);
+      color:var(--text);
+      padding:10px 12px;
+      border-radius:12px;
+      cursor:pointer;
+    }
+    .modeBtn.active{
+      border-color: rgba(34,197,94,.45);
+      background: rgba(34,197,94,.12);
+    }
+
+    .hidden{ display:none !important; }
 
     @media print{
       .btn, .pill, .toast, details.accordion{ display:none !important; }
@@ -607,6 +665,94 @@
         </div>
       </div>
     </div>
+
+    <div class="stack">
+      <div class="card">
+        <div class="hd">
+          <h2 data-i18n="converter_title">Material Converter</h2>
+          <div class="muted" data-i18n="converter_sub">Estimate volume and weight for common landscaping materials</div>
+        </div>
+        <div class="bd">
+          <div class="convGrid">
+            <div>
+              <div class="modeRow">
+                <button class="modeBtn active" id="modeRect" type="button" data-i18n="conv_mode_rect">Length × Width</button>
+                <button class="modeBtn" id="modeArea" type="button" data-i18n="conv_mode_area">Direct square feet</button>
+              </div>
+
+              <div class="row">
+                <div>
+                  <label data-i18n="conv_material">Material</label>
+                  <select id="convMaterial"></select>
+                </div>
+                <div>
+                  <label data-i18n="conv_depth">Depth (inches)</label>
+                  <input id="convDepth" type="text" inputmode="decimal" />
+                </div>
+              </div>
+
+              <div class="row" id="rectInputs">
+                <div>
+                  <label data-i18n="conv_length">Length (ft)</label>
+                  <input id="convLength" type="text" inputmode="decimal" />
+                </div>
+                <div>
+                  <label data-i18n="conv_width">Width (ft)</label>
+                  <input id="convWidth" type="text" inputmode="decimal" />
+                </div>
+              </div>
+
+              <div class="row hidden" id="areaInputs">
+                <div style="grid-column:1/-1">
+                  <label data-i18n="conv_sqft_direct">Area (sq ft)</label>
+                  <input id="convSqft" type="text" inputmode="decimal" />
+                </div>
+              </div>
+
+              <div class="hint" data-i18n="conv_tip">
+                Tip: for rock and gravel, tons are estimates. It’s smart to order a little extra.
+              </div>
+            </div>
+
+            <div>
+              <div class="resultGrid">
+                <div class="resultCard">
+                  <div class="rk" data-i18n="conv_result_sqft">Square feet</div>
+                  <div class="rv" id="rSqft">0.00</div>
+                </div>
+                <div class="resultCard">
+                  <div class="rk" data-i18n="conv_result_cuft">Cubic feet</div>
+                  <div class="rv" id="rCuft">0.00</div>
+                </div>
+                <div class="resultCard">
+                  <div class="rk" data-i18n="conv_result_cuyd">Cubic yards</div>
+                  <div class="rv" id="rCuyd">0.00</div>
+                </div>
+                <div class="resultCard">
+                  <div class="rk" data-i18n="conv_result_tons">Estimated tons</div>
+                  <div class="rv" id="rTons">0.00</div>
+                </div>
+              </div>
+
+              <div class="lineItem" style="margin-top:10px;">
+                <div>
+                  <div class="k" data-i18n="conv_note_title">Material note</div>
+                  <div class="v" id="convNoteText">—</div>
+                </div>
+              </div>
+
+              <div class="lineItem" style="margin-top:10px;">
+                <div>
+                  <div class="k" data-i18n="conv_recommend_title">Recommended with extra</div>
+                  <div class="v" id="convExtraText">—</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
   </div>
 
   <div class="toast" id="toast"></div>
@@ -723,7 +869,33 @@
         toast_copy_ok: "Summary copied.",
         toast_copy_fail: "Copy failed.",
         toast_import_ok: "Imported.",
-        toast_import_fail: "Import failed."
+        toast_import_fail: "Import failed.",
+
+        converter_title: "Material Converter",
+        converter_sub: "Estimate volume and weight for common landscaping materials",
+        conv_mode_rect: "Length × Width",
+        conv_mode_area: "Direct square feet",
+        conv_material: "Material",
+        conv_depth: "Depth (inches)",
+        conv_length: "Length (ft)",
+        conv_width: "Width (ft)",
+        conv_sqft_direct: "Area (sq ft)",
+        conv_result_sqft: "Square feet",
+        conv_result_cuft: "Cubic feet",
+        conv_result_cuyd: "Cubic yards",
+        conv_result_tons: "Estimated tons",
+        conv_note_title: "Material note",
+        conv_recommend_title: "Recommended with extra",
+        conv_tip: "Tip: for rock and gravel, tons are estimates. It’s smart to order a little extra.",
+        conv_note_mulch: "Mulch is usually ordered by cubic yard.",
+        conv_note_topsoil: "Topsoil can settle. A little extra is often helpful.",
+        conv_note_compost: "Compost is usually ordered by cubic yard.",
+        conv_note_pea: "Pea gravel is commonly ordered by ton.",
+        conv_note_gravel: "Gravel is commonly ordered by ton.",
+        conv_note_rock: "Decorative rock is commonly ordered by ton.",
+        conv_note_sand: "Sand can compact depending on moisture and base.",
+        conv_extra_cuyd: "With 10% extra: ",
+        conv_extra_tons: "With 10% extra tons: "
       },
       es: {
         chip_mobile: "Filas amigables en móvil",
@@ -833,7 +1005,33 @@
         toast_copy_ok: "Resumen copiado.",
         toast_copy_fail: "No se pudo copiar.",
         toast_import_ok: "Importado.",
-        toast_import_fail: "Falló la importación."
+        toast_import_fail: "Falló la importación.",
+
+        converter_title: "Convertidor de Materiales",
+        converter_sub: "Calcula volumen y peso para materiales comunes de jardinería",
+        conv_mode_rect: "Largo × Ancho",
+        conv_mode_area: "Pies cuadrados directos",
+        conv_material: "Material",
+        conv_depth: "Profundidad (pulgadas)",
+        conv_length: "Largo (pies)",
+        conv_width: "Ancho (pies)",
+        conv_sqft_direct: "Área (pie²)",
+        conv_result_sqft: "Pies cuadrados",
+        conv_result_cuft: "Pies cúbicos",
+        conv_result_cuyd: "Yardas cúbicas",
+        conv_result_tons: "Toneladas estimadas",
+        conv_note_title: "Nota del material",
+        conv_recommend_title: "Recomendado con extra",
+        conv_tip: "Tip: para piedra y grava, las toneladas son estimadas. Conviene pedir un poco extra.",
+        conv_note_mulch: "El mulch normalmente se ordena por yarda cúbica.",
+        conv_note_topsoil: "La tierra puede asentarse. A menudo conviene pedir un poco extra.",
+        conv_note_compost: "La composta normalmente se ordena por yarda cúbica.",
+        conv_note_pea: "La grava pea gravel normalmente se ordena por tonelada.",
+        conv_note_gravel: "La grava normalmente se ordena por tonelada.",
+        conv_note_rock: "La piedra decorativa normalmente se ordena por tonelada.",
+        conv_note_sand: "La arena puede compactarse según la humedad y la base.",
+        conv_extra_cuyd: "Con 10% extra: ",
+        conv_extra_tons: "Con 10% extra en toneladas: "
       }
     };
 
@@ -871,6 +1069,51 @@
       { key:"drainage",     unitKey:"linft", en:{name:"Drainage install",      unit:"linear ft"},    es:{name:"Instalación de drenaje",          unit:"pie lineal"} }
     ];
 
+    const MATERIAL_CATALOG = [
+      {
+        key:"mulch",
+        tonsPerCubicYard:0.35,
+        en:{name:"Mulch", noteKey:"conv_note_mulch"},
+        es:{name:"Mulch", noteKey:"conv_note_mulch"}
+      },
+      {
+        key:"topsoil",
+        tonsPerCubicYard:1.10,
+        en:{name:"Topsoil", noteKey:"conv_note_topsoil"},
+        es:{name:"Tierra negra", noteKey:"conv_note_topsoil"}
+      },
+      {
+        key:"compost",
+        tonsPerCubicYard:0.75,
+        en:{name:"Compost", noteKey:"conv_note_compost"},
+        es:{name:"Composta", noteKey:"conv_note_compost"}
+      },
+      {
+        key:"pea_gravel",
+        tonsPerCubicYard:1.35,
+        en:{name:"Pea gravel", noteKey:"conv_note_pea"},
+        es:{name:"Pea gravel", noteKey:"conv_note_pea"}
+      },
+      {
+        key:"gravel",
+        tonsPerCubicYard:1.40,
+        en:{name:"Gravel", noteKey:"conv_note_gravel"},
+        es:{name:"Grava", noteKey:"conv_note_gravel"}
+      },
+      {
+        key:"decorative_rock",
+        tonsPerCubicYard:1.30,
+        en:{name:"Decorative rock", noteKey:"conv_note_rock"},
+        es:{name:"Piedra decorativa", noteKey:"conv_note_rock"}
+      },
+      {
+        key:"sand",
+        tonsPerCubicYard:1.35,
+        en:{name:"Sand", noteKey:"conv_note_sand"},
+        es:{name:"Arena", noteKey:"conv_note_sand"}
+      }
+    ];
+
     const DEFAULT_STATE = () => ({
       lang: "en",
       business: { name:"", phone:"", address:"" },
@@ -884,7 +1127,15 @@
         disposalOn:false, disposalFee:0,
         travelOn:false, travelFee:0
       },
-      services: []
+      services: [],
+      converter: {
+        mode:"rect",
+        materialKey:"mulch",
+        length:0,
+        width:0,
+        sqft:0,
+        depthIn:2
+      }
     });
 
     let state = DEFAULT_STATE();
@@ -919,13 +1170,14 @@
     function money(n){ return (!isFinite(n) ? "$0.00" : "$" + n.toFixed(2)); }
     function toFixed2(n){ return (!isFinite(n) ? "" : n.toFixed(2)); }
     function clampNonNeg(n){ return (!isFinite(n) ? 0 : Math.max(0, n)); }
+    function fmt(n){ return (!isFinite(n) ? "0.00" : n.toFixed(2)); }
 
     function bindNumberInput(el, getDefaultValue, onValue){
       el.value = "";
       el.addEventListener("input", () => {
         const n = parseNumLoose(el.value);
         onValue(isFinite(n) ? n : getDefaultValue());
-        recalc(); autosave();
+        recalc(); recalcConverter(); autosave();
       });
       el.addEventListener("blur", () => {
         const n = parseNumLoose(el.value);
@@ -937,7 +1189,7 @@
       el.addEventListener("input", () => {
         const n = parseNumLoose(el.value);
         onValue(isFinite(n) ? n : getDefaultValue());
-        recalc(); autosave();
+        recalc(); recalcConverter(); autosave();
       });
       el.addEventListener("blur", () => {
         const n = parseNumLoose(el.value);
@@ -1006,6 +1258,23 @@
     const tGrand = $$("#tGrand");
     const tGrandMeta = $$("#tGrandMeta");
 
+    const convMaterial = $$("#convMaterial");
+    const convDepth = $$("#convDepth");
+    const convLength = $$("#convLength");
+    const convWidth = $$("#convWidth");
+    const convSqft = $$("#convSqft");
+    const modeRect = $$("#modeRect");
+    const modeArea = $$("#modeArea");
+    const rectInputs = $$("#rectInputs");
+    const areaInputs = $$("#areaInputs");
+
+    const rSqft = $$("#rSqft");
+    const rCuft = $$("#rCuft");
+    const rCuyd = $$("#rCuyd");
+    const rTons = $$("#rTons");
+    const convNoteText = $$("#convNoteText");
+    const convExtraText = $$("#convExtraText");
+
     function buildServicePicker(){
       while (svcPicker.options.length > 1) svcPicker.remove(1);
       const lang = state.lang || "en";
@@ -1015,6 +1284,18 @@
         opt.textContent = `${s[lang].name} (${s[lang].unit})`;
         svcPicker.appendChild(opt);
       });
+    }
+
+    function buildMaterialPicker(){
+      convMaterial.innerHTML = "";
+      const lang = state.lang || "en";
+      MATERIAL_CATALOG.forEach(m => {
+        const opt = document.createElement("option");
+        opt.value = m.key;
+        opt.textContent = m[lang].name;
+        convMaterial.appendChild(opt);
+      });
+      convMaterial.value = state.converter.materialKey || "mulch";
     }
 
     function renderBusinessHeader(){
@@ -1096,6 +1377,17 @@
       el.classList.toggle("on", !!on);
       el.setAttribute("aria-checked", (!!on).toString());
     }
+
+    function setConverterMode(mode){
+      state.converter.mode = mode === "area" ? "area" : "rect";
+      modeRect.classList.toggle("active", state.converter.mode === "rect");
+      modeArea.classList.toggle("active", state.converter.mode === "area");
+      rectInputs.classList.toggle("hidden", state.converter.mode !== "rect");
+      areaInputs.classList.toggle("hidden", state.converter.mode !== "area");
+      recalcConverter();
+      autosave();
+    }
+
     function setAddonEnabled(which, on){
       const s = state.settings;
       if(which==="equip"){ s.equipOn = !!on; setSwitch(swEquip, s.equipOn); equipFee.classList.toggle("amtOff", !s.equipOn); }
@@ -1165,6 +1457,29 @@
       tGrandMeta.textContent = bumped
         ? (state.lang==="es" ? `Se aplicó mínimo (${money(minFee)})` : `Minimum fee applied (${money(minFee)})`)
         : "—";
+    }
+
+    function recalcConverter(){
+      const conv = state.converter || {};
+      const areaSqFt = conv.mode === "area"
+        ? clampNonNeg(conv.sqft)
+        : clampNonNeg(conv.length) * clampNonNeg(conv.width);
+
+      const cubicFeet = areaSqFt * (clampNonNeg(conv.depthIn) / 12);
+      const cubicYards = cubicFeet / 27;
+
+      const mat = MATERIAL_CATALOG.find(m => m.key === conv.materialKey) || MATERIAL_CATALOG[0];
+      const tons = cubicYards * clampNonNeg(mat.tonsPerCubicYard);
+      const extraYards = cubicYards * 1.10;
+      const extraTons = tons * 1.10;
+
+      rSqft.textContent = fmt(areaSqFt);
+      rCuft.textContent = fmt(cubicFeet);
+      rCuyd.textContent = fmt(cubicYards);
+      rTons.textContent = fmt(tons);
+
+      convNoteText.textContent = t(mat[(state.lang||"en")].noteKey);
+      convExtraText.textContent = `${t("conv_extra_cuyd")}${fmt(extraYards)} | ${t("conv_extra_tons")}${fmt(extraTons)}`;
     }
 
     function addSelectedService(){
@@ -1270,9 +1585,17 @@
       materialsFee.classList.toggle("amtOff", !state.settings.materialsOn);
       disposalFee.classList.toggle("amtOff", !state.settings.disposalOn);
       travelFee.classList.toggle("amtOff", !state.settings.travelOn);
+
+      convDepth.value = state.converter.depthIn === 0 ? "" : String(state.converter.depthIn);
+      convLength.value = state.converter.length === 0 ? "" : String(state.converter.length);
+      convWidth.value = state.converter.width === 0 ? "" : String(state.converter.width);
+      convSqft.value = state.converter.sqft === 0 ? "" : String(state.converter.sqft);
+
+      buildMaterialPicker();
+      setConverterMode(state.converter.mode || "rect");
     }
 
-    const LS_KEY = "anchored_landscaping_invoice_v1_bilingual";
+    const LS_KEY = "anchored_landscaping_invoice_v2_bilingual_converter";
     function autosave(){ try{ localStorage.setItem(LS_KEY, JSON.stringify(state)); }catch(e){} }
     function loadSaved(){
       try{
@@ -1286,6 +1609,7 @@
         state.settings = Object.assign(base.settings, obj.settings || {});
         state.business = Object.assign(base.business, obj.business || {});
         state.meta = Object.assign(base.meta, obj.meta || {});
+        state.converter = Object.assign(base.converter, obj.converter || {});
 
         state.lang = (state.lang === "es") ? "es" : "en";
         return true;
@@ -1358,6 +1682,7 @@
           state.settings = Object.assign(base.settings, obj.settings || {});
           state.business = Object.assign(base.business, obj.business || {});
           state.meta = Object.assign(base.meta, obj.meta || {});
+          state.converter = Object.assign(base.converter, obj.converter || {});
           state.lang = (state.lang === "es") ? "es" : "en";
 
           syncFormFromState();
@@ -1365,6 +1690,7 @@
           renderBusinessHeader();
           renderServices();
           recalc();
+          recalcConverter();
           autosave();
           toast(t("toast_import_ok"));
         }catch(e){ toast(t("toast_import_fail")); }
@@ -1374,9 +1700,13 @@
 
     function loadSample(){
       const keepBusiness = { ...state.business };
+      const keepConverter = { ...state.converter };
+
       state = DEFAULT_STATE();
       state.lang = langSel.value || "en";
       state.business = keepBusiness;
+      state.converter = keepConverter;
+
       state.meta.custName = (state.lang==="es") ? "Cliente de ejemplo" : "Sample Customer";
       state.meta.jobAddr  = (state.lang==="es") ? "999 Calle Ejemplo, Saint Joseph, IL" : "999 Example Rd, Saint Joseph, IL";
       state.meta.invNo    = "AL-0001";
@@ -1400,6 +1730,7 @@
       renderBusinessHeader();
       renderServices();
       recalc();
+      recalcConverter();
       autosave();
       toast(t("toast_sample"));
     }
@@ -1407,10 +1738,12 @@
     function newJob(){
       const keepLang = state.lang || "en";
       const keepBusiness = { ...state.business };
+      const keepConverter = { ...state.converter };
 
       state = DEFAULT_STATE();
       state.lang = keepLang;
       state.business = keepBusiness;
+      state.converter = keepConverter;
       state.meta.invDate = todayStr();
 
       customSvcName.value = "";
@@ -1422,6 +1755,7 @@
       renderBusinessHeader();
       renderServices();
       recalc();
+      recalcConverter();
       autosave();
       toast(t("toast_new_job"));
     }
@@ -1448,10 +1782,12 @@
 
       syncFormFromState();
       buildServicePicker();
+      buildMaterialPicker();
 
       renderBusinessHeader();
       renderServices();
       recalc();
+      recalcConverter();
       autosave();
       if (!silent) toast(state.lang === "es" ? "Idioma: Español" : "Language: English");
     }
@@ -1472,6 +1808,20 @@
       bindMoneyInput(materialsFee,()=>0,(v)=>state.settings.materialsFee=v);
       bindMoneyInput(disposalFee,()=>0,(v)=>state.settings.disposalFee=v);
       bindMoneyInput(travelFee,()=>0,(v)=>state.settings.travelFee=v);
+
+      bindNumberInput(convDepth,()=>0,(v)=>state.converter.depthIn=v);
+      bindNumberInput(convLength,()=>0,(v)=>state.converter.length=v);
+      bindNumberInput(convWidth,()=>0,(v)=>state.converter.width=v);
+      bindNumberInput(convSqft,()=>0,(v)=>state.converter.sqft=v);
+
+      convMaterial.addEventListener("change", () => {
+        state.converter.materialKey = convMaterial.value || "mulch";
+        recalcConverter();
+        autosave();
+      });
+
+      modeRect.addEventListener("click", () => setConverterMode("rect"));
+      modeArea.addEventListener("click", () => setConverterMode("area"));
 
       const wireSwitch = (el, which) => {
         const toggle = ()=> setAddonEnabled(which, !(
@@ -1514,6 +1864,7 @@
 
     function init(){
       buildServicePicker();
+      buildMaterialPicker();
 
       if(!loadSaved()) state = DEFAULT_STATE();
       if(!state.meta.invDate) state.meta.invDate = todayStr();
@@ -1525,6 +1876,7 @@
       renderBusinessHeader();
       renderServices();
       recalc();
+      recalcConverter();
       wireInputs();
     }
 
