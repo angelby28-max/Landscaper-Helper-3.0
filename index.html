@@ -838,18 +838,37 @@
     };
 
     const SERVICE_CATALOG = [
-      { key:"mowing",   unitKey:"per_cut",  en:{name:"Mowing",               unit:"per cut"},     es:{name:"Corte de césped",        unit:"por corte"} },
-      { key:"trimming", unitKey:"flat",     en:{name:"Trimming / Edging",    unit:"flat"},        es:{name:"Recorte / Orilla",       unit:"fijo"} },
-      { key:"mulch",    unitKey:"cuyd",     en:{name:"Mulch install",        unit:"cubic yard"},  es:{name:"Instalación de mulch",   unit:"yarda cúbica"} },
-      { key:"rock",     unitKey:"ton",      en:{name:"Rock / Gravel",        unit:"ton"},         es:{name:"Piedra / Grava",         unit:"tonelada"} },
-      { key:"soil",     unitKey:"yd",       en:{name:"Soil / Topsoil",       unit:"yard"},        es:{name:"Tierra / Tierra negra",  unit:"yarda"} },
-      { key:"sod",      unitKey:"sqft",     en:{name:"Sod install",          unit:"sq ft"},       es:{name:"Instalación de césped",  unit:"pie²"} },
-      { key:"leaf",     unitKey:"hour",     en:{name:"Leaf cleanup",         unit:"hour"},        es:{name:"Limpieza de hojas",      unit:"hora"} },
-      { key:"bush",     unitKey:"per_bush", en:{name:"Bush trimming",        unit:"per bush"},    es:{name:"Poda de arbustos",       unit:"por arbusto"} },
-      { key:"hedge",    unitKey:"linft",    en:{name:"Hedge trimming",       unit:"linear ft"},   es:{name:"Poda de seto",           unit:"pie lineal"} },
-      { key:"cleanup",  unitKey:"flat",     en:{name:"Spring / Fall cleanup",unit:"flat"},        es:{name:"Limpieza primavera/otoño",unit:"fijo"} },
-      { key:"weeding",  unitKey:"hour",     en:{name:"Weeding",              unit:"hour"},        es:{name:"Deshierbe",              unit:"hora"} },
-      { key:"haul",     unitKey:"flat",     en:{name:"Haul-away / Dump fee", unit:"flat"},        es:{name:"Retiro / Basurero",      unit:"fijo"} },
+      { key:"mowing",   unitKey:"per_cut",   en:{name:"Mowing",                unit:"per cut"},      es:{name:"Corte de césped",                 unit:"por corte"} },
+      { key:"trimming", unitKey:"flat",      en:{name:"Trimming / Edging",     unit:"flat"},         es:{name:"Recorte / Orilla",                unit:"fijo"} },
+      { key:"mulch",    unitKey:"cuyd",      en:{name:"Mulch install",         unit:"cubic yard"},   es:{name:"Instalación de mulch",            unit:"yarda cúbica"} },
+      { key:"rock",     unitKey:"ton",       en:{name:"Rock / Gravel",         unit:"ton"},          es:{name:"Piedra / Grava",                  unit:"tonelada"} },
+      { key:"soil",     unitKey:"yd",        en:{name:"Soil / Topsoil",        unit:"yard"},         es:{name:"Tierra / Tierra negra",           unit:"yarda"} },
+      { key:"sod",      unitKey:"sqft",      en:{name:"Sod install",           unit:"sq ft"},        es:{name:"Instalación de césped",           unit:"pie²"} },
+      { key:"leaf",     unitKey:"hour",      en:{name:"Leaf cleanup",          unit:"hour"},         es:{name:"Limpieza de hojas",               unit:"hora"} },
+      { key:"bush",     unitKey:"per_bush",  en:{name:"Bush trimming",         unit:"per bush"},     es:{name:"Poda de arbustos",                unit:"por arbusto"} },
+      { key:"hedge",    unitKey:"linft",     en:{name:"Hedge trimming",        unit:"linear ft"},    es:{name:"Poda de seto",                    unit:"pie lineal"} },
+      { key:"cleanup",  unitKey:"flat",      en:{name:"Spring / Fall cleanup", unit:"flat"},         es:{name:"Limpieza primavera/otoño",        unit:"fijo"} },
+      { key:"weeding",  unitKey:"hour",      en:{name:"Weeding",               unit:"hour"},         es:{name:"Deshierbe",                       unit:"hora"} },
+      { key:"haul",     unitKey:"flat",      en:{name:"Haul-away / Dump fee",  unit:"flat"},         es:{name:"Retiro / Basurero",               unit:"fijo"} },
+
+      { key:"bush_removal",  unitKey:"per_bush",  en:{name:"Bush removal",         unit:"per bush"},   es:{name:"Remoción de arbusto",             unit:"por arbusto"} },
+      { key:"plant_removal", unitKey:"per_plant", en:{name:"Plant removal",        unit:"per plant"},  es:{name:"Remoción de planta",              unit:"por planta"} },
+
+      { key:"aeration",     unitKey:"sqft",  en:{name:"Lawn aeration",         unit:"sq ft"},        es:{name:"Aireación de césped",             unit:"pie²"} },
+      { key:"dethatching",  unitKey:"sqft",  en:{name:"Lawn dethatching",      unit:"sq ft"},        es:{name:"Descompactado de césped",         unit:"pie²"} },
+      { key:"overseeding",  unitKey:"sqft",  en:{name:"Overseeding",           unit:"sq ft"},        es:{name:"Resiembra",                       unit:"pie²"} },
+
+      { key:"pavers",       unitKey:"sqft",  en:{name:"Paver patio install",   unit:"sq ft"},        es:{name:"Instalación de patio de adoquín", unit:"pie²"} },
+      { key:"walkway",      unitKey:"sqft",  en:{name:"Walkway install",       unit:"sq ft"},        es:{name:"Instalación de camino",           unit:"pie²"} },
+      { key:"edging_install", unitKey:"linft", en:{name:"Edging install",      unit:"linear ft"},    es:{name:"Instalación de borde",            unit:"pie lineal"} },
+
+      { key:"plant_install", unitKey:"per_plant", en:{name:"Plant installation", unit:"per plant"},  es:{name:"Instalación de plantas",          unit:"por planta"} },
+
+      { key:"tree_trim",    unitKey:"per_tree", en:{name:"Small tree trimming", unit:"per tree"},    es:{name:"Poda de árbol pequeño",           unit:"por árbol"} },
+
+      { key:"grading",      unitKey:"sqft",  en:{name:"Grading / leveling",    unit:"sq ft"},        es:{name:"Nivelación de terreno",           unit:"pie²"} },
+
+      { key:"drainage",     unitKey:"linft", en:{name:"Drainage install",      unit:"linear ft"},    es:{name:"Instalación de drenaje",          unit:"pie lineal"} }
     ];
 
     const DEFAULT_STATE = () => ({
