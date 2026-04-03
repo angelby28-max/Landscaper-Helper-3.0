@@ -214,7 +214,7 @@
     }
     .lineItem .k{ color:var(--muted); font-size:12px; }
     .lineItem .v{ font-size:14px; }
-    .grand{ border-color: rgba(34,197,94,.45); background: rgba(34,197,94,.08); }
+    .grand{ border-color: rgba(34,197,94,.45); background: rgba(34,197,94,.08); margin-top:4px; }
     .grand .v{ font-size:18px; font-weight:700; }
     .split{ display:flex; gap:10px; flex-wrap:wrap; }
     .split .btn{ flex: 1 1 180px; }
@@ -610,10 +610,10 @@
 
       .footerMessage{
         display:block !important;
-        margin-top:18px !important;
-        padding:14px 0 0 !important;
+        margin-top:28px !important;
+        padding:18px 0 0 !important;
         border:none !important;
-        border-top:2px solid #111111 !important;
+        border-top:none !important;
         border-radius:0 !important;
         background:#ffffff !important;
         color:#111111 !important;
@@ -877,6 +877,8 @@
             </div>
           </details>
 
+          </div>
+
           <div style="margin:14px 0 10px;">
             <div class="totals">
               <div class="lineItem client-hidden">
@@ -924,15 +926,14 @@
             </div>
           </div>
 
-          <div class="split">
+          <div class="split client-hidden">
             <button class="btn primary" id="btnPrint" data-i18n="btn_print">Print / Save PDF</button>
             <button class="btn" id="btnExport" data-i18n="btn_export">Export JSON</button>
             <button class="btn" id="btnImport" data-i18n="btn_import">Import JSON</button>
           </div>
 
-          <div class="hint" style="margin-top:10px;" data-i18n="hint_print">
+          <div class="hint client-hidden" style="margin-top:10px;" data-i18n="hint_print">
             Print tip: choose “Save as PDF”.
-          </div>
           </div>
 
           <div class="clientControls">
