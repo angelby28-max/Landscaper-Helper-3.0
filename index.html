@@ -367,12 +367,67 @@
       background: rgba(34,197,94,.12);
     }
 
+    .clientControls{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+      margin:12px 0 10px;
+    }
+    .clientToggleBox{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding:10px 12px;
+      border:1px solid var(--line);
+      border-radius:12px;
+      background:rgba(255,255,255,.02);
+    }
+    .clientServiceSummary{
+      border:1px solid var(--line);
+      border-radius:12px;
+      background:rgba(255,255,255,.02);
+      padding:12px;
+      margin-top:12px;
+    }
+    .clientServiceSummary h3{
+      margin:0 0 10px;
+      font-size:14px;
+    }
+    .clientServiceSummary ul{
+      margin:0;
+      padding-left:18px;
+    }
+    .clientServiceSummary li{
+      margin:0 0 8px;
+    }
+    .footerMessage{
+      display:none;
+      margin-top:14px;
+      padding:14px 16px;
+      border:1px solid var(--line);
+      border-radius:12px;
+      background:rgba(255,255,255,.02);
+      color:var(--text);
+      line-height:1.45;
+      font-size:13px;
+    }
+
     .hidden{ display:none !important; }
+
+    body.client-mode .client-hidden{ display:none !important; }
+    body.client-mode .client-only{ display:block !important; }
+    body.client-mode .client-only-flex{ display:flex !important; }
 
     @media print{
       .btn, .pill, .toast, details.accordion{ display:none !important; }
       body{ background:white; color:black; }
       .card{ box-shadow:none; }
+      body.print-client .client-hidden, body.print-client .hide-on-client-print{ display:none !important; }
+      body.print-client .client-only{ display:block !important; }
+      body.print-client .client-only-flex{ display:flex !important; }
+      body.print-client .footerMessage{ display:block !important; }
+      body.print-client .clientServiceSummary{ display:block !important; }
     }
   </style>
 </head>
@@ -490,7 +545,7 @@
             <button class="btn" id="btnAddCustomSvc" data-i18n="btn_add_custom">Add custom</button>
           </div>
 
-          <div style="margin-top:12px;">
+          <div style="margin-top:12px;" class="client-hidden">
             <table>
               <thead>
                 <tr>
@@ -505,6 +560,11 @@
               <tbody id="svcTableBody"></tbody>
             </table>
           </div>
+
+          <div id="clientServiceSummary" class="clientServiceSummary client-only hidden">
+            <h3 data-i18n="client_services_title">Services Included</h3>
+            <ul id="clientServiceList"></ul>
+          </div>
         </div>
       </div>
 
@@ -514,6 +574,7 @@
           <button class="btn small" id="btnCopyText" data-i18n="btn_copy">Copy summary</button>
         </div>
         <div class="bd">
+          <div class="client-hidden">
           <div class="row">
             <div>
               <label data-i18n="lab_labor_rate">Labor $/hr</label>
@@ -608,41 +669,41 @@
 
           <div style="margin:14px 0 10px;">
             <div class="totals">
-              <div class="lineItem">
+              <div class="lineItem client-hidden">
                 <div><div class="k" data-i18n="k_services">Services subtotal</div><div class="v" id="tServices">$0.00</div></div>
                 <div class="muted" id="tServicesMeta"></div>
               </div>
-              <div class="lineItem">
+              <div class="lineItem client-hidden">
                 <div><div class="k" data-i18n="k_labor">Labor</div><div class="v" id="tLabor">$0.00</div></div>
                 <div class="muted" id="tLaborMeta"></div>
               </div>
 
-              <div class="lineItem">
+              <div class="lineItem client-hidden">
                 <div><div class="k" data-i18n="k_equip">Equipment wear & tear</div><div class="v" id="tEquip">$0.00</div></div>
                 <div class="muted" id="tEquipMeta"></div>
               </div>
-              <div class="lineItem">
+              <div class="lineItem client-hidden">
                 <div><div class="k" data-i18n="k_materials">Materials & consumables</div><div class="v" id="tMaterials">$0.00</div></div>
                 <div class="muted" id="tMaterialsMeta"></div>
               </div>
-              <div class="lineItem">
+              <div class="lineItem client-hidden">
                 <div><div class="k" data-i18n="k_disposal">Disposal fees</div><div class="v" id="tDisposal">$0.00</div></div>
                 <div class="muted" id="tDisposalMeta"></div>
               </div>
-              <div class="lineItem">
+              <div class="lineItem client-hidden">
                 <div><div class="k" data-i18n="k_travel">Travel & mobilization</div><div class="v" id="tTravel">$0.00</div></div>
                 <div class="muted" id="tTravelMeta"></div>
               </div>
 
-              <div class="lineItem">
+              <div class="lineItem client-hidden">
                 <div><div class="k" data-i18n="k_overhead">Overhead</div><div class="v" id="tOverhead">$0.00</div></div>
                 <div class="muted" id="tOverheadMeta"></div>
               </div>
-              <div class="lineItem">
+              <div class="lineItem client-hidden">
                 <div><div class="k" data-i18n="k_profit">Profit</div><div class="v" id="tProfit">$0.00</div></div>
                 <div class="muted" id="tProfitMeta"></div>
               </div>
-              <div class="lineItem">
+              <div class="lineItem client-hidden">
                 <div><div class="k" data-i18n="k_discount">Discount</div><div class="v" id="tDiscount">$0.00</div></div>
                 <div class="muted" id="tDiscountMeta"></div>
               </div>
@@ -662,12 +723,21 @@
           <div class="hint" style="margin-top:10px;" data-i18n="hint_print">
             Print tip: choose “Save as PDF”.
           </div>
+          </div>
+
+          <div class="clientControls">
+            <div class="clientToggleBox">
+              <span data-i18n="client_mode_label">Client Mode</span>
+              <div class="switch" id="swClientMode" role="switch" aria-checked="false" tabindex="0"></div>
+            </div>
+            <button class="btn" id="btnPrintClient" data-i18n="btn_print_client">Print Client Version</button>
+          </div>
         </div>
       </div>
     </div>
 
     <div class="stack">
-      <div class="card">
+      <div class="card client-hidden">
         <div class="hd">
           <h2 data-i18n="converter_title">Material Converter</h2>
           <div class="split">
@@ -755,6 +825,10 @@
         </div>
       </div>
 
+
+      <div id="footerMessage" class="footerMessage client-only">
+        Thank you for choosing Anchored Landscaping LLC. We truly appreciate the opportunity to work with you and take pride in delivering quality results you can rely on. We look forward to helping you with any future landscaping needs.
+      </div>
     </div>
   </div>
 
@@ -783,6 +857,10 @@
         btn_export: "Export JSON",
         btn_import: "Import JSON",
         btn_clear_converter: "Clear Converter",
+        btn_print_client: "Print Client Version",
+        client_mode_label: "Client Mode",
+        client_services_title: "Services Included",
+        footer_message: "Thank you for choosing Anchored Landscaping LLC. We truly appreciate the opportunity to work with you and take pride in delivering quality results you can rely on. We look forward to helping you with any future landscaping needs.",
 
         lab_bizname: "Business name",
         ph_bizname: "Your business name",
@@ -871,6 +949,8 @@
         toast_new_job: "New job started.",
         toast_clear_business: "Business info cleared.",
         toast_clear_converter: "Converter cleared.",
+        toast_client_mode_on: "Client Mode on.",
+        toast_client_mode_off: "Client Mode off.",
         toast_copy_ok: "Summary copied.",
         toast_copy_fail: "Copy failed.",
         toast_import_ok: "Imported.",
@@ -921,6 +1001,10 @@
         btn_export: "Exportar JSON",
         btn_import: "Importar JSON",
         btn_clear_converter: "Borrar convertidor",
+        btn_print_client: "Imprimir versión para cliente",
+        client_mode_label: "Modo cliente",
+        client_services_title: "Servicios incluidos",
+        footer_message: "Thank you for choosing Anchored Landscaping LLC. We truly appreciate the opportunity to work with you and take pride in delivering quality results you can rely on. We look forward to helping you with any future landscaping needs.",
 
         lab_bizname: "Nombre del negocio",
         ph_bizname: "Tu nombre de negocio",
@@ -1009,6 +1093,8 @@
         toast_new_job: "Nuevo trabajo iniciado.",
         toast_clear_business: "Datos del negocio borrados.",
         toast_clear_converter: "Convertidor borrado.",
+        toast_client_mode_on: "Modo cliente activado.",
+        toast_client_mode_off: "Modo cliente desactivado.",
         toast_copy_ok: "Resumen copiado.",
         toast_copy_fail: "No se pudo copiar.",
         toast_import_ok: "Importado.",
@@ -1135,6 +1221,7 @@
         travelOn:false, travelFee:0
       },
       services: [],
+      ui: { clientMode:false },
       converter: {
         mode:"rect",
         materialKey:"mulch",
@@ -1264,6 +1351,11 @@
     const tDiscountMeta = $$("#tDiscountMeta");
     const tGrand = $$("#tGrand");
     const tGrandMeta = $$("#tGrandMeta");
+
+    const swClientMode = $$("#swClientMode");
+    const clientServiceSummary = $$("#clientServiceSummary");
+    const clientServiceList = $$("#clientServiceList");
+    const footerMessage = $$("#footerMessage");
 
     const convMaterial = $$("#convMaterial");
     const convDepth = $$("#convDepth");
@@ -1411,6 +1503,53 @@
       recalc(); autosave();
     }
 
+    function renderClientServiceSummary(){
+      clientServiceList.innerHTML = "";
+      if (!state.services.length){
+        const li = document.createElement("li");
+        li.textContent = (state.lang === "es") ? "No hay servicios agregados." : "No services added.";
+        clientServiceList.appendChild(li);
+        return;
+      }
+
+      state.services.forEach(line => {
+        const li = document.createElement("li");
+        const qty = clampNonNeg(line.qty);
+        const qtyText = qty > 0 ? ` — ${qty} ${line.unit}` : "";
+        li.textContent = `${line.name}${qtyText}`;
+        clientServiceList.appendChild(li);
+      });
+    }
+
+    function setClientMode(on, silent){
+      state.ui = state.ui || { clientMode:false };
+      state.ui.clientMode = !!on;
+      document.body.classList.toggle("client-mode", state.ui.clientMode);
+      setSwitch(swClientMode, state.ui.clientMode);
+      clientServiceSummary.classList.toggle("hidden", !state.ui.clientMode);
+      footerMessage.textContent = t("footer_message");
+      renderClientServiceSummary();
+      autosave();
+      if (!silent) toast(t(state.ui.clientMode ? "toast_client_mode_on" : "toast_client_mode_off"));
+    }
+
+    function printClientVersion(){
+      const wasOn = !!(state.ui && state.ui.clientMode);
+      setClientMode(true, true);
+      document.body.classList.add("print-client");
+
+      const cleanup = () => {
+        document.body.classList.remove("print-client");
+        if (!wasOn) setClientMode(false, true);
+        window.removeEventListener("afterprint", cleanup);
+      };
+
+      window.addEventListener("afterprint", cleanup);
+      setTimeout(() => { window.print(); }, 50);
+      setTimeout(cleanup, 1500);
+    }
+
+
     function recalc(){
       const servicesSubtotal = state.services.reduce((sum, l) => sum + (clampNonNeg(l.qty) * clampNonNeg(l.unitPrice)), 0);
       const laborTotal = clampNonNeg(state.settings.laborRate) * clampNonNeg(state.settings.laborHours);
@@ -1471,6 +1610,9 @@
       tGrandMeta.textContent = bumped
         ? (state.lang==="es" ? `Se aplicó mínimo (${money(minFee)})` : `Minimum fee applied (${money(minFee)})`)
         : "—";
+
+      renderClientServiceSummary();
+      footerMessage.textContent = t("footer_message");
     }
 
     function recalcConverter(){
@@ -1614,6 +1756,9 @@
 
       buildMaterialPicker();
       setConverterMode(state.converter.mode || "rect");
+      footerMessage.textContent = t("footer_message");
+      renderClientServiceSummary();
+      setClientMode(!!(state.ui && state.ui.clientMode), true);
     }
 
     const LS_KEY = "anchored_landscaping_invoice_v2_bilingual_converter";
@@ -1630,6 +1775,7 @@
         state.settings = Object.assign(base.settings, obj.settings || {});
         state.business = Object.assign(base.business, obj.business || {});
         state.meta = Object.assign(base.meta, obj.meta || {});
+        state.ui = Object.assign(base.ui, obj.ui || {});
         state.converter = Object.assign(base.converter, obj.converter || {});
 
         state.lang = (state.lang === "es") ? "es" : "en";
@@ -1703,6 +1849,7 @@
           state.settings = Object.assign(base.settings, obj.settings || {});
           state.business = Object.assign(base.business, obj.business || {});
           state.meta = Object.assign(base.meta, obj.meta || {});
+          state.ui = Object.assign(base.ui, obj.ui || {});
           state.converter = Object.assign(base.converter, obj.converter || {});
           state.lang = (state.lang === "es") ? "es" : "en";
 
@@ -1722,10 +1869,12 @@
     function loadSample(){
       const keepBusiness = { ...state.business };
       const keepConverter = { ...state.converter };
+      const keepUI = { ...(state.ui || { clientMode:false }) };
 
       state = DEFAULT_STATE();
       state.lang = langSel.value || "en";
       state.business = keepBusiness;
+      state.ui = keepUI;
       state.converter = keepConverter;
 
       state.meta.custName = (state.lang==="es") ? "Cliente de ejemplo" : "Sample Customer";
@@ -1752,6 +1901,8 @@
       renderServices();
       recalc();
       recalcConverter();
+      footerMessage.textContent = t("footer_message");
+      setClientMode(!!(state.ui && state.ui.clientMode), true);
       autosave();
       toast(t("toast_sample"));
     }
@@ -1760,10 +1911,12 @@
       const keepLang = state.lang || "en";
       const keepBusiness = { ...state.business };
       const keepConverter = { ...state.converter };
+      const keepUI = { ...(state.ui || { clientMode:false }) };
 
       state = DEFAULT_STATE();
       state.lang = keepLang;
       state.business = keepBusiness;
+      state.ui = keepUI;
       state.converter = keepConverter;
       state.meta.invDate = todayStr();
 
@@ -1880,6 +2033,8 @@
       wireSwitch(swMaterials, "materials");
       wireSwitch(swDisposal, "disposal");
       wireSwitch(swTravel, "travel");
+      swClientMode.addEventListener("click", ()=>{ setClientMode(!(state.ui && state.ui.clientMode)); });
+      swClientMode.addEventListener("keydown", (e)=>{ if(e.key==="Enter" || e.key===" "){ e.preventDefault(); setClientMode(!(state.ui && state.ui.clientMode)); } });
 
       $$("#btnAddSvc").addEventListener("click", addSelectedService);
       $$("#btnAddCustomSvc").addEventListener("click", addCustomService);
@@ -1900,6 +2055,7 @@
       $$("#btnClearConverter").addEventListener("click", clearConverter);
       $$("#btnCopyText").addEventListener("click", copySummary);
       $$("#btnPrint").addEventListener("click", ()=>window.print());
+      $$("#btnPrintClient").addEventListener("click", printClientVersion);
       $$("#btnExport").addEventListener("click", exportJSON);
       $$("#btnImport").addEventListener("click", importJSON);
 
