@@ -1296,13 +1296,20 @@
     function buildMaterialPicker(){
       convMaterial.innerHTML = "";
       const lang = state.lang || "en";
+
+      const placeholder = document.createElement("option");
+      placeholder.value = "";
+      placeholder.textContent = (lang === "es") ? "Selecciona material…" : "Select material…";
+      convMaterial.appendChild(placeholder);
+
       MATERIAL_CATALOG.forEach(m => {
         const opt = document.createElement("option");
         opt.value = m.key;
         opt.textContent = m[lang].name;
         convMaterial.appendChild(opt);
       });
-      convMaterial.value = state.converter.materialKey || "mulch";
+
+      convMaterial.value = state.converter.materialKey || "";
     }
 
     function renderBusinessHeader(){
@@ -1475,8 +1482,8 @@
       const cubicFeet = areaSqFt * (clampNonNeg(conv.depthIn) / 12);
       const cubicYards = cubicFeet / 27;
 
-      const mat = MATERIAL_CATALOG.find(m => m.key === conv.materialKey) || MATERIAL_CATALOG[0];
-      const tons = cubicYards * clampNonNeg(mat.tonsPerCubicYard);
+      const mat = MATERIAL_CATALOG.find(m => m.key === conv.materialKey);
+      const tons = mat ? (cubicYards * clampNonNeg(mat.tonsPerCubicYard)) : 0;
       const extraYards = cubicYards * 1.10;
       const extraTons = tons * 1.10;
 
@@ -1485,8 +1492,10 @@
       rCuyd.textContent = fmt(cubicYards);
       rTons.textContent = fmt(tons);
 
-      convNoteText.textContent = t(mat[(state.lang||"en")].noteKey);
-      convExtraText.textContent = `${t("conv_extra_cuyd")}${fmt(extraYards)} | ${t("conv_extra_tons")}${fmt(extraTons)}`;
+      convNoteText.textContent = mat ? t(mat[(state.lang||"en")].noteKey) : "—";
+      convExtraText.textContent = mat
+        ? `${t("conv_extra_cuyd")}${fmt(extraYards)} | ${t("conv_extra_tons")}${fmt(extraTons)}`
+        : "—";
     }
 
     function addSelectedService(){
@@ -1830,7 +1839,7 @@
       bindNumberInput(convSqft,()=>0,(v)=>state.converter.sqft=v);
 
       convMaterial.addEventListener("change", () => {
-        state.converter.materialKey = convMaterial.value || "mulch";
+        state.converter.materialKey = convMaterial.value || "";
         recalcConverter();
         autosave();
       });
