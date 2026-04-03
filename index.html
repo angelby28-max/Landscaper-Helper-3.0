@@ -105,7 +105,23 @@
       outline:none;
       font-size:16px;
     }
-    textarea{ min-height:84px; resize:vertical; }
+    textarea{ min-height:84px; resize:vertical; overflow:auto; }
+
+    .print-only{ display:none !important; }
+    .printValueBlock{
+      display:none;
+      width:100%;
+      white-space:pre-wrap;
+      word-break:break-word;
+      background:var(--card2);
+      color:var(--text);
+      border:1px solid var(--line);
+      border-radius:12px;
+      padding:10px 12px;
+      line-height:1.5;
+      font-size:16px;
+      min-height:84px;
+    }
 
     select{
       appearance:none;
@@ -515,8 +531,9 @@
 
       .card .hd{
         background:#ffffff !important;
-        border-bottom:1px solid #d1d5db !important;
-        padding:10px 0 8px !important;
+        border-bottom:none !important;
+        padding:0 0 10px !important;
+        margin-bottom:10px !important;
       }
 
       .card .hd h2{
@@ -528,7 +545,7 @@
       }
 
       .card .bd{
-        padding:12px 0 0 !important;
+        padding:0 !important;
       }
 
       input[type="text"], textarea, select{
@@ -540,9 +557,39 @@
         padding:0 !important;
         font-size:14px !important;
         min-height:auto !important;
+        appearance:none !important;
+        -webkit-appearance:none !important;
       }
 
-      textarea{ min-height:unset !important; resize:none !important; }
+      input[type="number"]::-webkit-outer-spin-button,
+      input[type="number"]::-webkit-inner-spin-button,
+      textarea::-webkit-scrollbar,
+      select::-webkit-scrollbar{
+        -webkit-appearance:none !important;
+        display:none !important;
+      }
+
+      textarea{
+        min-height:unset !important;
+        resize:none !important;
+        overflow:visible !important;
+        height:auto !important;
+      }
+
+      #notes{ display:none !important; }
+      #notesPrint{
+        display:block !important;
+        background:#ffffff !important;
+        color:#111111 !important;
+        border:none !important;
+        border-radius:0 !important;
+        box-shadow:none !important;
+        padding:0 !important;
+        min-height:0 !important;
+        white-space:pre-wrap !important;
+        word-break:break-word !important;
+        line-height:1.55 !important;
+      }
 
       label{
         display:block !important;
@@ -723,6 +770,7 @@
             <div style="grid-column:1/-1">
               <label data-i18n="lab_notes">Notes</label>
               <textarea id="notes"></textarea>
+              <div id="notesPrint" class="printValueBlock print-only" aria-hidden="true"></div>
             </div>
           </div>
 
@@ -1516,6 +1564,7 @@
     const invNo    = $$("#invNo");
     const invDate  = $$("#invDate");
     const notes    = $$("#notes");
+    const notesPrint = $$("#notesPrint");
 
     const svcPicker = $$("#svcPicker");
     const svcTbody  = $$("#svcTableBody");
@@ -1714,6 +1763,249 @@
       recalc(); autosave();
     }
 
+
+    function syncPrintableFields(){
+      syncStateFromForm();
+      const noteText = (state.meta.notes || "").trim();
+      notesPrint.textContent = noteText || ((state.lang === "es") ? "Sin notas." : "No notes.");
+    }
+
+    function autoResizeNotes(){
+      notes.style.height = "auto";
+      notes.style.height = `${Math.max(notes.scrollHeight, 84)}px`;
+    }
+
+    function prepareForPrint(){
+      syncPrintableFields();
+      autoResizeNotes();
+      footerMessage.textContent = t("footer_message");
+      renderClientServiceSummary();
+    }
+
+    function cleanupAfterPrint(){
+      notes.style.height = "";
+    }
+
+    function escapeHtml(value){
+      return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+
+    function buildClientPrintHtml(){
+      prepareForPrint();
+
+      const bizLineParts = [state.business.name, state.business.phone, state.business.address].filter(Boolean);
+      const serviceItems = state.services.length
+        ? state.services.map(line => {
+            const qty = clampNonNeg(line.qty);
+            const qtyText = qty > 0 ? ` — ${qty} ${escapeHtml(line.unit || "")}` : "";
+            return `<li>${escapeHtml(line.name || "")}${qtyText}</li>`;
+          }).join("")
+        : `<li>${state.lang === "es" ? "No hay servicios agregados." : "No services added."}</li>`;
+
+      const notesText = (state.meta.notes || "").trim() || (state.lang === "es" ? "Sin notas." : "No notes.");
+
+      return `<!doctype html>
+<html lang="${escapeHtml(state.lang || "en")}">
+<head>
+  <meta charset="utf-8">
+  <title>${escapeHtml(state.business.name || t("hdr_default"))} — ${escapeHtml(t("btn_print_client"))}</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <style>
+    :root{ color-scheme: light; }
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      font-family:"Segoe UI", Arial, sans-serif;
+      color:#111111;
+      background:#ffffff;
+      -webkit-print-color-adjust:exact;
+      print-color-adjust:exact;
+    }
+    .page{
+      max-width:850px;
+      margin:0 auto;
+      padding:32px 28px 40px;
+    }
+    .top{
+      border-bottom:2px solid #111111;
+      padding-bottom:12px;
+      margin-bottom:22px;
+    }
+    .biz{
+      font-size:32px;
+      font-weight:800;
+      line-height:1.1;
+      margin:0 0 8px;
+    }
+    .sub{
+      color:#4b5563;
+      font-size:14px;
+      line-height:1.45;
+    }
+    .section{
+      margin:0 0 18px;
+      border:1px solid #d1d5db;
+      padding:18px 18px 16px;
+      break-inside:avoid;
+      page-break-inside:avoid;
+    }
+    .section h2{
+      margin:0 0 14px;
+      font-size:15px;
+      font-weight:800;
+      text-transform:uppercase;
+      letter-spacing:.05em;
+    }
+    .grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:14px 20px;
+    }
+    .field .k{
+      margin:0 0 4px;
+      color:#4b5563;
+      font-size:11px;
+      font-weight:700;
+      text-transform:uppercase;
+      letter-spacing:.04em;
+    }
+    .field .v{
+      font-size:16px;
+      line-height:1.45;
+      white-space:pre-wrap;
+      word-break:break-word;
+    }
+    .full{ grid-column:1 / -1; }
+    .services{
+      margin:0;
+      padding-left:20px;
+    }
+    .services li{
+      margin:0 0 8px;
+      line-height:1.45;
+    }
+    .grand{
+      border:2px solid #111111;
+      padding:14px 16px;
+      display:flex;
+      justify-content:space-between;
+      gap:16px;
+      align-items:flex-end;
+      margin-top:8px;
+    }
+    .grand .k{
+      color:#4b5563;
+      font-size:12px;
+      font-weight:700;
+      text-transform:uppercase;
+      letter-spacing:.04em;
+      margin-bottom:6px;
+    }
+    .grand .v{
+      font-size:34px;
+      font-weight:800;
+      line-height:1;
+    }
+    .footer{
+      margin-top:28px;
+      font-size:14px;
+      line-height:1.6;
+    }
+    @page{ margin:0.55in; }
+    @media print{
+      .page{ max-width:none; padding:0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="top">
+      <div class="biz">${escapeHtml(state.business.name || t("hdr_default"))}</div>
+      <div class="sub">${escapeHtml(bizLineParts.join(" • "))}</div>
+    </div>
+
+    <div class="section">
+      <h2>${escapeHtml(t("left_title"))}</h2>
+      <div class="grid">
+        <div class="field">
+          <div class="k">${escapeHtml(t("lab_bizname"))}</div>
+          <div class="v">${escapeHtml(state.business.name || "—")}</div>
+        </div>
+        <div class="field">
+          <div class="k">${escapeHtml(t("lab_bizphone"))}</div>
+          <div class="v">${escapeHtml(state.business.phone || "—")}</div>
+        </div>
+        <div class="field full">
+          <div class="k">${escapeHtml(t("lab_bizaddr"))}</div>
+          <div class="v">${escapeHtml(state.business.address || "—")}</div>
+        </div>
+        <div class="field">
+          <div class="k">${escapeHtml(t("lab_custname"))}</div>
+          <div class="v">${escapeHtml(state.meta.custName || "—")}</div>
+        </div>
+        <div class="field">
+          <div class="k">${escapeHtml(t("lab_jobaddr"))}</div>
+          <div class="v">${escapeHtml(state.meta.jobAddr || "—")}</div>
+        </div>
+        <div class="field">
+          <div class="k">${escapeHtml(t("lab_invno"))}</div>
+          <div class="v">${escapeHtml(state.meta.invNo || "—")}</div>
+        </div>
+        <div class="field">
+          <div class="k">${escapeHtml(t("lab_date"))}</div>
+          <div class="v">${escapeHtml(state.meta.invDate || "—")}</div>
+        </div>
+        <div class="field full">
+          <div class="k">${escapeHtml(t("lab_notes"))}</div>
+          <div class="v">${escapeHtml(notesText)}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>${escapeHtml(t("client_services_title"))}</h2>
+      <ul class="services">${serviceItems}</ul>
+    </div>
+
+    <div class="section">
+      <h2>${escapeHtml(t("right_title"))}</h2>
+      <div class="grand">
+        <div>
+          <div class="k">${escapeHtml(t("k_total"))}</div>
+          <div class="v">${escapeHtml(tGrand.textContent || "$0.00")}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">${escapeHtml(t("footer_message"))}</div>
+  </div>
+
+  <script>
+    window.addEventListener("load", function(){
+      setTimeout(function(){ window.print(); }, 250);
+    });
+  <\/script>
+</body>
+</html>`;
+    }
+
+    function openPrintWindow(html){
+      const printWin = window.open("", "_blank", "noopener,noreferrer");
+      if (!printWin){
+        window.print();
+        return;
+      }
+      printWin.document.open();
+      printWin.document.write(html);
+      printWin.document.close();
+      printWin.focus();
+    }
+
     function renderClientServiceSummary(){
       clientServiceList.innerHTML = "";
       if (!state.services.length){
@@ -1745,19 +2037,7 @@
     }
 
     function printClientVersion(){
-      const wasOn = !!(state.ui && state.ui.clientMode);
-      setClientMode(true, true);
-      document.body.classList.add("print-client");
-
-      const cleanup = () => {
-        document.body.classList.remove("print-client");
-        if (!wasOn) setClientMode(false, true);
-        window.removeEventListener("afterprint", cleanup);
-      };
-
-      window.addEventListener("afterprint", cleanup);
-      setTimeout(() => { window.print(); }, 50);
-      setTimeout(cleanup, 1500);
+      openPrintWindow(buildClientPrintHtml());
     }
 
 
@@ -1925,6 +2205,8 @@
       invNo.value    = state.meta.invNo || "";
       invDate.value  = state.meta.invDate || todayStr();
       notes.value    = state.meta.notes || "";
+      syncPrintableFields();
+      autoResizeNotes();
 
       bizName.placeholder = t("ph_bizname");
       bizPhone.placeholder = t("ph_bizphone");
@@ -2201,8 +2483,9 @@
 
     function wireInputs(){
       [bizName,bizPhone,bizAddr,custName,jobAddr,invNo,invDate,notes].forEach(el=>{
-        el.addEventListener("input", ()=>{ syncStateFromForm(); renderBusinessHeader(); recalc(); autosave(); });
+        el.addEventListener("input", ()=>{ syncStateFromForm(); renderBusinessHeader(); recalc(); syncPrintableFields(); autosave(); });
       });
+      notes.addEventListener("input", autoResizeNotes);
 
       bindMoneyInput(laborRate,()=>0,(v)=>state.settings.laborRate=v);
       bindNumberInput(laborHours,()=>0,(v)=>state.settings.laborHours=v);
@@ -2265,7 +2548,7 @@
       $$("#btnClearBusiness").addEventListener("click", clearBusinessInfo);
       $$("#btnClearConverter").addEventListener("click", clearConverter);
       $$("#btnCopyText").addEventListener("click", copySummary);
-      $$("#btnPrint").addEventListener("click", ()=>window.print());
+      $$("#btnPrint").addEventListener("click", ()=>{ prepareForPrint(); window.print(); });
       $$("#btnPrintClient").addEventListener("click", printClientVersion);
       $$("#btnExport").addEventListener("click", exportJSON);
       $$("#btnImport").addEventListener("click", importJSON);
@@ -2290,6 +2573,9 @@
       recalcConverter();
       wireInputs();
     }
+
+    window.addEventListener("beforeprint", prepareForPrint);
+    window.addEventListener("afterprint", cleanupAfterPrint);
 
     init();
   </script>
