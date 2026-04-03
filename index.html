@@ -2037,7 +2037,23 @@
     }
 
     function printClientVersion(){
-      openPrintWindow(buildClientPrintHtml());
+      const wasOn = !!(state.ui && state.ui.clientMode);
+      setClientMode(true, true);
+      document.body.classList.add("print-client");
+
+      const cleanup = () => {
+        document.body.classList.remove("print-client");
+        if (!wasOn) setClientMode(false, true);
+        window.removeEventListener("afterprint", cleanup);
+      };
+
+      window.addEventListener("afterprint", cleanup);
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          window.print();
+        });
+      });
+      setTimeout(cleanup, 2000);
     }
 
 
