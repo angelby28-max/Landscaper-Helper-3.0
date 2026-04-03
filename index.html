@@ -1481,21 +1481,26 @@
 
       const cubicFeet = areaSqFt * (clampNonNeg(conv.depthIn) / 12);
       const cubicYards = cubicFeet / 27;
-
       const mat = MATERIAL_CATALOG.find(m => m.key === conv.materialKey);
-      const tons = mat ? (cubicYards * clampNonNeg(mat.tonsPerCubicYard)) : 0;
-      const extraYards = cubicYards * 1.10;
-      const extraTons = tons * 1.10;
 
       rSqft.textContent = fmt(areaSqFt);
       rCuft.textContent = fmt(cubicFeet);
       rCuyd.textContent = fmt(cubicYards);
-      rTons.textContent = fmt(tons);
 
-      convNoteText.textContent = mat ? t(mat[(state.lang||"en")].noteKey) : "—";
-      convExtraText.textContent = mat
-        ? `${t("conv_extra_cuyd")}${fmt(extraYards)} | ${t("conv_extra_tons")}${fmt(extraTons)}`
-        : "—";
+      if (!mat){
+        rTons.textContent = "0.00";
+        convNoteText.textContent = "—";
+        convExtraText.textContent = "—";
+        return;
+      }
+
+      const tons = cubicYards * clampNonNeg(mat.tonsPerCubicYard);
+      const extraYards = cubicYards * 1.10;
+      const extraTons = tons * 1.10;
+
+      rTons.textContent = fmt(tons);
+      convNoteText.textContent = t(mat[(state.lang||"en")].noteKey);
+      convExtraText.textContent = `${t("conv_extra_cuyd")}${fmt(extraYards)} | ${t("conv_extra_tons")}${fmt(extraTons)}`;
     }
 
     function addSelectedService(){
@@ -1777,8 +1782,22 @@
     }
 
     function clearConverter(){
-      state.converter = { ...DEFAULT_STATE().converter };
-      syncFormFromState();
+      state.converter = {
+        mode:"rect",
+        materialKey:"",
+        length:0,
+        width:0,
+        sqft:0,
+        depthIn:0
+      };
+
+      convMaterial.value = "";
+      convDepth.value = "";
+      convLength.value = "";
+      convWidth.value = "";
+      convSqft.value = "";
+
+      setConverterMode("rect");
       recalcConverter();
       autosave();
       toast(t("toast_clear_converter"));
