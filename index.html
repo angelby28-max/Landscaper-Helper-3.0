@@ -670,7 +670,10 @@
       <div class="card">
         <div class="hd">
           <h2 data-i18n="converter_title">Material Converter</h2>
-          <div class="muted" data-i18n="converter_sub">Estimate volume and weight for common landscaping materials</div>
+          <div class="split">
+            <div class="muted" data-i18n="converter_sub">Estimate volume and weight for common landscaping materials</div>
+            <button class="btn small danger" id="btnClearConverter" data-i18n="btn_clear_converter">Clear Converter</button>
+          </div>
         </div>
         <div class="bd">
           <div class="convGrid">
@@ -779,6 +782,7 @@
         btn_print: "Print / Save PDF",
         btn_export: "Export JSON",
         btn_import: "Import JSON",
+        btn_clear_converter: "Clear Converter",
 
         lab_bizname: "Business name",
         ph_bizname: "Your business name",
@@ -866,6 +870,7 @@
         toast_sample: "Sample loaded.",
         toast_new_job: "New job started.",
         toast_clear_business: "Business info cleared.",
+        toast_clear_converter: "Converter cleared.",
         toast_copy_ok: "Summary copied.",
         toast_copy_fail: "Copy failed.",
         toast_import_ok: "Imported.",
@@ -915,6 +920,7 @@
         btn_print: "Imprimir / Guardar PDF",
         btn_export: "Exportar JSON",
         btn_import: "Importar JSON",
+        btn_clear_converter: "Borrar convertidor",
 
         lab_bizname: "Nombre del negocio",
         ph_bizname: "Tu nombre de negocio",
@@ -1002,6 +1008,7 @@
         toast_sample: "Ejemplo cargado.",
         toast_new_job: "Nuevo trabajo iniciado.",
         toast_clear_business: "Datos del negocio borrados.",
+        toast_clear_converter: "Convertidor borrado.",
         toast_copy_ok: "Resumen copiado.",
         toast_copy_fail: "No se pudo copiar.",
         toast_import_ok: "Importado.",
@@ -1760,6 +1767,14 @@
       toast(t("toast_new_job"));
     }
 
+    function clearConverter(){
+      state.converter = { ...DEFAULT_STATE().converter };
+      syncFormFromState();
+      recalcConverter();
+      autosave();
+      toast(t("toast_clear_converter"));
+    }
+
     function clearBusinessInfo(){
       state.business = { name:"", phone:"", address:"" };
       bizName.value = "";
@@ -1854,6 +1869,7 @@
       $$("#btnSample").addEventListener("click", loadSample);
       $$("#btnNewJob").addEventListener("click", newJob);
       $$("#btnClearBusiness").addEventListener("click", clearBusinessInfo);
+      $$("#btnClearConverter").addEventListener("click", clearConverter);
       $$("#btnCopyText").addEventListener("click", copySummary);
       $$("#btnPrint").addEventListener("click", ()=>window.print());
       $$("#btnExport").addEventListener("click", exportJSON);
