@@ -420,14 +420,224 @@
     body.client-mode .client-only-flex{ display:flex !important; }
 
     @media print{
-      .btn, .pill, .toast, details.accordion{ display:none !important; }
-      body{ background:white; color:black; }
-      .card{ box-shadow:none; }
-      body.print-client .client-hidden, body.print-client .hide-on-client-print{ display:none !important; }
-      body.print-client .client-only{ display:block !important; }
-      body.print-client .client-only-flex{ display:flex !important; }
-      body.print-client .footerMessage{ display:block !important; }
-      body.print-client .clientServiceSummary{ display:block !important; }
+      @page{ margin: 0.55in; }
+
+      html, body{
+        background:#ffffff !important;
+        color:#111111 !important;
+      }
+
+      body{
+        font-family: "Segoe UI", Arial, sans-serif !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      .btn, .pill, .toast, details.accordion,
+      .clientControls,
+      .sectionActions,
+      .svcAdd,
+      .svcCustomGrid,
+      #btnCopyText,
+      #btnNewJob,
+      #btnSample,
+      #btnSave,
+      #btnClearBusiness,
+      #btnExport,
+      #btnImport,
+      #btnClearConverter,
+      .hint[data-i18n="hint_mobile_cards"],
+      .hint[data-i18n="hint_print"]{
+        display:none !important;
+      }
+
+      .wrap{
+        max-width:none !important;
+        width:100% !important;
+        padding:0 !important;
+        margin:0 !important;
+      }
+
+      .grid,
+      .stack,
+      .convGrid,
+      .resultGrid,
+      .row{
+        display:block !important;
+        gap:0 !important;
+      }
+
+      .top{
+        margin:0 0 18px !important;
+        padding-bottom:12px !important;
+        border-bottom:2px solid #111111 !important;
+      }
+
+      .brand h1{
+        color:#111111 !important;
+        font-size:24px !important;
+        font-weight:700 !important;
+        letter-spacing:.2px !important;
+      }
+
+      .brand .sub,
+      .muted,
+      .lineItem .k,
+      label,
+      .hint,
+      .accTitle .s,
+      .resultCard .rk{
+        color:#4b5563 !important;
+      }
+
+      .card,
+      .lineItem,
+      .clientServiceSummary,
+      .resultCard,
+      .toggleRow,
+      .footerMessage,
+      table,
+      th,
+      td{
+        background:#ffffff !important;
+        color:#111111 !important;
+        box-shadow:none !important;
+      }
+
+      .card{
+        border:1px solid #d1d5db !important;
+        border-radius:0 !important;
+        margin:0 0 16px !important;
+        overflow:visible !important;
+        break-inside:avoid;
+        page-break-inside:avoid;
+      }
+
+      .card .hd{
+        background:#ffffff !important;
+        border-bottom:1px solid #d1d5db !important;
+        padding:10px 0 8px !important;
+      }
+
+      .card .hd h2{
+        color:#111111 !important;
+        font-size:15px !important;
+        font-weight:700 !important;
+        text-transform:uppercase;
+        letter-spacing:.05em;
+      }
+
+      .card .bd{
+        padding:12px 0 0 !important;
+      }
+
+      input[type="text"], textarea, select{
+        background:transparent !important;
+        color:#111111 !important;
+        border:none !important;
+        border-radius:0 !important;
+        box-shadow:none !important;
+        padding:0 !important;
+        font-size:14px !important;
+        min-height:auto !important;
+      }
+
+      textarea{ min-height:unset !important; resize:none !important; }
+
+      label{
+        display:block !important;
+        margin:0 0 4px !important;
+        font-size:11px !important;
+        font-weight:600 !important;
+        text-transform:uppercase;
+        letter-spacing:.04em;
+      }
+
+      .row > div,
+      .svcCustomGrid > div{
+        margin:0 0 12px !important;
+      }
+
+      .clientServiceSummary{
+        display:block !important;
+        border:1px solid #d1d5db !important;
+        border-radius:0 !important;
+        padding:14px 16px !important;
+        margin-top:14px !important;
+      }
+
+      .clientServiceSummary h3{
+        margin:0 0 10px !important;
+        font-size:14px !important;
+        font-weight:700 !important;
+        color:#111111 !important;
+        text-transform:uppercase;
+        letter-spacing:.04em;
+      }
+
+      .clientServiceSummary ul{
+        margin:0 !important;
+        padding-left:18px !important;
+      }
+
+      .clientServiceSummary li{
+        color:#111111 !important;
+        margin:0 0 8px !important;
+        line-height:1.45 !important;
+      }
+
+      .totals{
+        gap:8px !important;
+      }
+
+      .lineItem{
+        border:1px solid #d1d5db !important;
+        border-radius:0 !important;
+        padding:10px 12px !important;
+      }
+
+      .grand{
+        border:2px solid #111111 !important;
+        background:#ffffff !important;
+        margin-top:8px !important;
+      }
+
+      .grand .v{
+        color:#111111 !important;
+        font-size:22px !important;
+        font-weight:800 !important;
+      }
+
+      .footerMessage{
+        display:block !important;
+        margin-top:18px !important;
+        padding:14px 0 0 !important;
+        border:none !important;
+        border-top:2px solid #111111 !important;
+        border-radius:0 !important;
+        background:#ffffff !important;
+        color:#111111 !important;
+        font-size:14px !important;
+        line-height:1.6 !important;
+      }
+
+      body.print-client .client-hidden,
+      body.print-client .hide-on-client-print{
+        display:none !important;
+      }
+
+      body.print-client .client-only{
+        display:block !important;
+      }
+
+      body.print-client .client-only-flex{
+        display:flex !important;
+      }
+
+      body.print-client .footerMessage,
+      body.print-client .clientServiceSummary{
+        display:block !important;
+      }
     }
   </style>
 </head>
