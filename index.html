@@ -2204,7 +2204,36 @@
     }
 
     function printClientVersion(){
-      openPrintWindow(buildClientPrintHtml());
+      const wasOn = !!(state.ui && state.ui.clientMode);
+      setClientMode(true, true);
+      document.body.classList.add("print-client");
+      prepareForPrint();
+
+      const finishPrintClient = () => {
+        document.body.classList.remove("print-client");
+        if (!wasOn) setClientMode(false, true);
+        cleanupAfterPrint();
+      };
+
+      const onAfter = () => {
+        window.removeEventListener("afterprint", onAfter);
+        finishPrintClient();
+      };
+
+      window.addEventListener("afterprint", onAfter);
+
+      try{
+        window.print();
+      }catch(err){
+        window.removeEventListener("afterprint", onAfter);
+        finishPrintClient();
+        throw err;
+      }
+
+      setTimeout(() => {
+        window.removeEventListener("afterprint", onAfter);
+        finishPrintClient();
+      }, 1200);
     }
 
     async function downloadClientPdf(){
