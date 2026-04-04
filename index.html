@@ -2231,6 +2231,9 @@
           const job = state.jobs.find(item => item.id === id);
           if (!job) return;
           job.status = el.value || "Estimate";
+          if (job.status === "Paid"){
+            job.paidDate = todayStr();
+          }
           autosave();
           renderJobs();
           renderMoneySummary();
@@ -2259,13 +2262,17 @@
       }
 
       state.jobs = Array.isArray(state.jobs) ? state.jobs : [];
+      const normalizedJobDate = normalizeDateInput(jobTrackDate.value || todayStr()) || todayStr();
+      const savedStatus = jobStatus.value || "Estimate";
+
       state.jobs.unshift({
         id: `job_${Date.now()}_${Math.random().toString(36).slice(2,8)}`,
         clientName: (jobClientName.value || "").trim(),
         jobName: rawName,
         total: Math.max(0, parseNumLoose(jobTotal.value) || 0),
-        status: jobStatus.value || "Estimate",
-        date: normalizeDateInput(jobTrackDate.value || todayStr()) || todayStr()
+        status: savedStatus,
+        date: normalizedJobDate,
+        paidDate: savedStatus === "Paid" ? todayStr() : ""
       });
 
       autosave();
@@ -2316,7 +2323,7 @@
       const jobs = Array.isArray(state.jobs) ? state.jobs : [];
       return jobs
         .filter(job => (job.status || "") === "Paid")
-        .filter(job => isCurrentMonthDate(job.date))
+        .filter(job => isCurrentMonthDate(job.paidDate || job.date))
         .reduce((sum, job) => sum + clampNonNeg(job.total || 0), 0);
     }
 
