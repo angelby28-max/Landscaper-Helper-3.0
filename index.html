@@ -506,6 +506,26 @@
       font-size:12px;
     }
 
+
+    .moneyGrid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:14px;
+    }
+    @media (max-width: 980px){
+      .moneyGrid{ grid-template-columns: 1fr; }
+    }
+    .moneySummary{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:10px;
+      margin-bottom:14px;
+    }
+    .expenseList{
+      display:grid;
+      gap:10px;
+    }
+
     .hidden{ display:none !important; }
 
     body.pdf-client-export{
@@ -527,7 +547,8 @@
     body.pdf-client-export .card.client-hidden,
     body.pdf-client-export .split.client-hidden,
     body.pdf-client-export .client-hidden.card,
-    body.pdf-client-export #jobsTrackerCard{
+    body.pdf-client-export #jobsTrackerCard,
+    body.pdf-client-export #moneyTrackerCard{
       display:none !important;
     }
     body.pdf-client-export .wrap{
@@ -659,6 +680,7 @@
 
       .btn, .pill, .toast, details.accordion,
       #jobsTrackerCard,
+      #moneyTrackerCard,
       .clientControls,
       .sectionActions,
       .svcAdd,
@@ -1377,6 +1399,69 @@
         </div>
       </div>
 
+      <div class="card client-hidden" id="moneyTrackerCard">
+        <div class="hd">
+          <h2 data-i18n="money_title">Simple Money Tracker</h2>
+          <div class="muted" data-i18n="money_sub">Track paid income and manual expenses for this month.</div>
+        </div>
+        <div class="bd">
+          <div class="moneySummary">
+            <div class="lineItem">
+              <div class="k" data-i18n="money_income_month">Income This Month</div>
+              <div class="v" id="moneyIncomeMonth">$0.00</div>
+            </div>
+            <div class="lineItem">
+              <div class="k" data-i18n="money_expenses_month">Expenses This Month</div>
+              <div class="v" id="moneyExpensesMonth">$0.00</div>
+            </div>
+            <div class="lineItem grand">
+              <div class="k" data-i18n="money_profit_month">Profit This Month</div>
+              <div class="v" id="moneyProfitMonth">$0.00</div>
+            </div>
+          </div>
+
+          <div class="moneyGrid">
+            <div class="jobFormCard">
+              <div class="row">
+                <div>
+                  <label data-i18n="money_expense_name_label">Expense Name</label>
+                  <input id="expenseName" type="text" />
+                </div>
+                <div>
+                  <label data-i18n="money_expense_amount_label">Amount</label>
+                  <input id="expenseAmount" type="text" inputmode="decimal" />
+                </div>
+              </div>
+              <div class="row">
+                <div>
+                  <label data-i18n="money_expense_date_label">Date</label>
+                  <input id="expenseDate" type="text" />
+                </div>
+                <div></div>
+              </div>
+              <div class="split">
+                <button class="btn primary" id="btnSaveExpense" data-i18n="btn_save_expense">Add expense</button>
+              </div>
+              <div class="hint" style="margin-top:10px;" data-i18n="money_tip">
+                Income comes from jobs marked Paid. Expenses are manual entries like gas, materials, and tools.
+              </div>
+            </div>
+
+            <div class="jobListCard">
+              <div class="jobListHead">
+                <div>
+                  <div style="font-weight:600;" data-i18n="money_expenses_saved_title">Saved Expenses</div>
+                  <div class="jobMuted" data-i18n="money_expenses_saved_sub">Only this month counts in the totals above.</div>
+                </div>
+              </div>
+              <div id="expensesEmpty" class="jobsEmpty" data-i18n="money_expenses_empty">No expenses saved yet.</div>
+              <div id="expenseList" class="expenseList hidden"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
       <div id="footerMessage" class="footerMessage client-only">
         Thank you for choosing Anchored Landscaping LLC. We truly appreciate the opportunity to work with you and take pride in delivering quality results you can rely on. We look forward to helping you with any future landscaping needs.
       </div>
@@ -1441,6 +1526,24 @@
         toast_job_status_saved: "Job status updated.",
         toast_job_prefilled: "Job tracker filled from current estimate.",
         toast_job_name_required: "Enter a job name first.",
+        money_title: "Simple Money Tracker",
+        money_sub: "Track paid income and manual expenses for this month.",
+        money_income_month: "Income This Month",
+        money_expenses_month: "Expenses This Month",
+        money_profit_month: "Profit This Month",
+        money_expense_name_label: "Expense Name",
+        money_expense_amount_label: "Amount",
+        money_expense_date_label: "Date",
+        money_expenses_saved_title: "Saved Expenses",
+        money_expenses_saved_sub: "Only this month counts in the totals above.",
+        money_expenses_empty: "No expenses saved yet.",
+        money_tip: "Income comes from jobs marked Paid. Expenses are manual entries like gas, materials, and tools.",
+        btn_save_expense: "Add expense",
+        ph_expense_name: "Gas, mulch, tool repair...",
+        toast_expense_saved: "Expense saved.",
+        toast_expense_deleted: "Expense deleted.",
+        toast_expense_name_required: "Enter an expense name first.",
+        toast_expense_amount_required: "Enter a valid amount.",
 
         lab_bizname: "Business name",
         ph_bizname: "Your business name",
@@ -1589,6 +1692,52 @@
         client_mode_label: "Modo cliente",
         client_services_title: "Servicios incluidos",
         footer_message: "Thank you for choosing Anchored Landscaping LLC. We truly appreciate the opportunity to work with you and take pride in delivering quality results you can rely on. We look forward to helping you with any future landscaping needs.",
+        jobs_title: "Seguimiento simple de trabajos",
+        jobs_sub: "Guarda estimados, trabajos activos y trabajos pagados en un solo lugar.",
+        jobs_client_label: "Nombre del cliente",
+        jobs_name_label: "Nombre del trabajo",
+        jobs_total_label: "Precio total",
+        jobs_status_label: "Estado",
+        jobs_date_label: "Fecha",
+        jobs_saved_title: "Trabajos guardados",
+        jobs_saved_sub: "Actualiza el estado o bórralo cuando ya no lo necesites.",
+        jobs_empty: "Todavía no hay trabajos guardados.",
+        jobs_th_client: "Cliente",
+        jobs_th_job: "Trabajo",
+        jobs_th_total: "Total",
+        jobs_th_status: "Estado",
+        jobs_th_date: "Fecha",
+        jobs_th_actions: "Acciones",
+        jobs_tip: "Mantén esto simple: Estimado = pendiente, En progreso = aprobado o activo, Pagado = terminado y cobrado.",
+        btn_use_current_estimate: "Usar estimado actual",
+        btn_save_tracked_job: "Guardar trabajo",
+        job_status_estimate: "Estimado",
+        job_status_progress: "En progreso",
+        job_status_paid: "Pagado",
+        job_default_name: "Trabajo de jardinería",
+        toast_job_saved: "Trabajo guardado.",
+        toast_job_deleted: "Trabajo borrado.",
+        toast_job_status_saved: "Estado del trabajo actualizado.",
+        toast_job_prefilled: "El seguimiento se llenó con el estimado actual.",
+        toast_job_name_required: "Primero escribe un nombre para el trabajo.",
+        money_title: "Seguimiento simple de dinero",
+        money_sub: "Controla ingresos pagados y gastos manuales de este mes.",
+        money_income_month: "Ingresos de este mes",
+        money_expenses_month: "Gastos de este mes",
+        money_profit_month: "Ganancia de este mes",
+        money_expense_name_label: "Nombre del gasto",
+        money_expense_amount_label: "Cantidad",
+        money_expense_date_label: "Fecha",
+        money_expenses_saved_title: "Gastos guardados",
+        money_expenses_saved_sub: "Solo este mes cuenta en los totales de arriba.",
+        money_expenses_empty: "Todavía no hay gastos guardados.",
+        money_tip: "Los ingresos vienen de trabajos marcados como Pagado. Los gastos son entradas manuales como gasolina, materiales y herramientas.",
+        btn_save_expense: "Agregar gasto",
+        ph_expense_name: "Gasolina, mulch, reparación de herramienta...",
+        toast_expense_saved: "Gasto guardado.",
+        toast_expense_deleted: "Gasto borrado.",
+        toast_expense_name_required: "Primero escribe un nombre para el gasto.",
+        toast_expense_amount_required: "Escribe una cantidad válida.",
 
         lab_bizname: "Nombre del negocio",
         ph_bizname: "Tu nombre de negocio",
@@ -1809,6 +1958,7 @@
       },
       services: [],
       jobs: [],
+      expenses: [],
       ui: { clientMode:false },
       converter: {
         mode:"rect",
@@ -1954,6 +2104,14 @@
     const jobsEmpty = $$("#jobsEmpty");
     const jobsTableWrap = $$("#jobsTableWrap");
     const jobsTableBody = $$("#jobsTableBody");
+    const expenseName = $$("#expenseName");
+    const expenseAmount = $$("#expenseAmount");
+    const expenseDate = $$("#expenseDate");
+    const expensesEmpty = $$("#expensesEmpty");
+    const expenseList = $$("#expenseList");
+    const moneyIncomeMonth = $$("#moneyIncomeMonth");
+    const moneyExpensesMonth = $$("#moneyExpensesMonth");
+    const moneyProfitMonth = $$("#moneyProfitMonth");
 
 
     const convMaterial = $$("#convMaterial");
@@ -2075,6 +2233,7 @@
           job.status = el.value || "Estimate";
           autosave();
           renderJobs();
+          renderMoneySummary();
           toast(t("toast_job_status_saved"));
         });
       });
@@ -2085,6 +2244,7 @@
           state.jobs = (state.jobs || []).filter(item => item.id !== id);
           autosave();
           renderJobs();
+          renderMoneySummary();
           toast(t("toast_job_deleted"));
         });
       });
@@ -2105,13 +2265,147 @@
         jobName: rawName,
         total: Math.max(0, parseNumLoose(jobTotal.value) || 0),
         status: jobStatus.value || "Estimate",
-        date: (jobTrackDate.value || todayStr()).trim()
+        date: normalizeDateInput(jobTrackDate.value || todayStr()) || todayStr()
       });
 
       autosave();
       renderJobs();
+      renderMoneySummary();
       clearJobTrackerForm();
       toast(t("toast_job_saved"));
+    }
+
+
+    function clearExpenseForm(){
+      expenseName.value = "";
+      expenseAmount.value = "";
+      expenseDate.value = todayStr();
+    }
+
+    function normalizeDateInput(value){
+      const raw = String(value || "").trim();
+      if (!raw) return "";
+      const iso = raw.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+      if (iso) return `${iso[2]}/${iso[3]}/${iso[1]}`;
+      return raw;
+    }
+
+    function parseDateLoose(value){
+      const raw = String(value || "").trim();
+      if (!raw) return null;
+      let m = raw.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+      if (m) return new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
+      m = raw.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/);
+      if (m){
+        let year = Number(m[3]);
+        if (year < 100) year += 2000;
+        return new Date(year, Number(m[1]) - 1, Number(m[2]));
+      }
+      const d = new Date(raw);
+      return isNaN(d.getTime()) ? null : d;
+    }
+
+    function isCurrentMonthDate(value){
+      const d = parseDateLoose(value);
+      if (!d) return false;
+      const now = new Date();
+      return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+    }
+
+    function getCurrentMonthIncome(){
+      const jobs = Array.isArray(state.jobs) ? state.jobs : [];
+      return jobs
+        .filter(job => (job.status || "") === "Paid")
+        .filter(job => isCurrentMonthDate(job.date))
+        .reduce((sum, job) => sum + clampNonNeg(job.total || 0), 0);
+    }
+
+    function getCurrentMonthExpensesTotal(){
+      const expenses = Array.isArray(state.expenses) ? state.expenses : [];
+      return expenses
+        .filter(exp => isCurrentMonthDate(exp.date))
+        .reduce((sum, exp) => sum + clampNonNeg(exp.amount || 0), 0);
+    }
+
+    function renderMoneySummary(){
+      const income = getCurrentMonthIncome();
+      const expenses = getCurrentMonthExpensesTotal();
+      const profit = income - expenses;
+      moneyIncomeMonth.textContent = money(income);
+      moneyExpensesMonth.textContent = money(expenses);
+      moneyProfitMonth.textContent = money(profit);
+    }
+
+    function renderExpenses(){
+      const expenses = Array.isArray(state.expenses) ? state.expenses : [];
+      expenseList.innerHTML = "";
+
+      if (!expenses.length){
+        expensesEmpty.classList.remove("hidden");
+        expenseList.classList.add("hidden");
+        renderMoneySummary();
+        return;
+      }
+
+      expensesEmpty.classList.add("hidden");
+      expenseList.classList.remove("hidden");
+
+      expenses.forEach(exp => {
+        const row = document.createElement("div");
+        row.className = "lineItem";
+        row.innerHTML = `
+          <div>
+            <div style="font-weight:600;">${escapeHtml(exp.name || "—")}</div>
+            <div class="jobMuted">${escapeHtml(exp.date || "—")}</div>
+          </div>
+          <div class="jobActions">
+            <span>${money(clampNonNeg(exp.amount || 0))}</span>
+            <button class="btn small danger" data-expense-action="delete" data-expense-id="${escapeHtml(exp.id)}">${escapeHtml(t("btn_remove"))}</button>
+          </div>
+        `;
+        expenseList.appendChild(row);
+      });
+
+      expenseList.querySelectorAll('[data-expense-action="delete"]').forEach(btn => {
+        btn.addEventListener("click", () => {
+          const id = btn.getAttribute("data-expense-id");
+          state.expenses = (state.expenses || []).filter(item => item.id !== id);
+          autosave();
+          renderExpenses();
+          toast(t("toast_expense_deleted"));
+        });
+      });
+
+      renderMoneySummary();
+    }
+
+    function saveExpense(){
+      const rawName = (expenseName.value || "").trim();
+      if (!rawName){
+        toast(t("toast_expense_name_required"));
+        expenseName.focus();
+        return;
+      }
+
+      const amountValue = clampNonNeg(parseNumLoose(expenseAmount.value) || 0);
+      if (!amountValue){
+        toast(t("toast_expense_amount_required"));
+        expenseAmount.focus();
+        return;
+      }
+
+      state.expenses = Array.isArray(state.expenses) ? state.expenses : [];
+      state.expenses.unshift({
+        id: `exp_${Date.now()}_${Math.random().toString(36).slice(2,8)}`,
+        name: rawName,
+        amount: amountValue,
+        date: normalizeDateInput(expenseDate.value || todayStr()) || todayStr()
+      });
+
+      autosave();
+      renderExpenses();
+      clearExpenseForm();
+      toast(t("toast_expense_saved"));
     }
 
 
@@ -2775,7 +3069,10 @@
       jobClientName.placeholder = t("ph_custname");
       jobName.placeholder = t("job_default_name");
       jobTotal.placeholder = "0.00";
+      expenseName.placeholder = t("ph_expense_name");
+      expenseAmount.placeholder = "0.00";
       if (!jobTrackDate.value) jobTrackDate.value = todayStr();
+      if (!expenseDate.value) expenseDate.value = todayStr();
       buildJobStatusPicker();
 
       laborRate.value   = state.settings.laborRate===0 ? "" : toFixed2(state.settings.laborRate);
@@ -2810,6 +3107,7 @@
       footerMessage.textContent = t("footer_message");
       renderClientServiceSummary();
       renderJobs();
+      renderExpenses();
       setClientMode(!!(state.ui && state.ui.clientMode), true);
     }
 
@@ -2830,6 +3128,7 @@
         state.ui = Object.assign(base.ui, obj.ui || {});
         state.converter = Object.assign(base.converter, obj.converter || {});
         state.jobs = Array.isArray(obj.jobs) ? obj.jobs : [];
+        state.expenses = Array.isArray(obj.expenses) ? obj.expenses : [];
 
         state.lang = (state.lang === "es") ? "es" : "en";
         return true;
@@ -2905,6 +3204,7 @@
           state.ui = Object.assign(base.ui, obj.ui || {});
           state.converter = Object.assign(base.converter, obj.converter || {});
           state.jobs = Array.isArray(obj.jobs) ? obj.jobs : [];
+          state.expenses = Array.isArray(obj.expenses) ? obj.expenses : [];
           state.lang = (state.lang === "es") ? "es" : "en";
 
           syncFormFromState();
@@ -2924,12 +3224,16 @@
       const keepBusiness = { ...state.business };
       const keepConverter = { ...state.converter };
       const keepUI = { ...(state.ui || { clientMode:false }) };
+      const keepJobs = Array.isArray(state.jobs) ? [...state.jobs] : [];
+      const keepExpenses = Array.isArray(state.expenses) ? [...state.expenses] : [];
 
       state = DEFAULT_STATE();
       state.lang = langSel.value || "en";
       state.business = keepBusiness;
       state.ui = keepUI;
       state.converter = keepConverter;
+      state.jobs = keepJobs;
+      state.expenses = keepExpenses;
 
       state.meta.custName = (state.lang==="es") ? "Cliente de ejemplo" : "Sample Customer";
       state.meta.jobAddr  = (state.lang==="es") ? "999 Calle Ejemplo, Saint Joseph, IL" : "999 Example Rd, Saint Joseph, IL";
@@ -2966,12 +3270,16 @@
       const keepBusiness = { ...state.business };
       const keepConverter = { ...state.converter };
       const keepUI = { ...(state.ui || { clientMode:false }) };
+      const keepJobs = Array.isArray(state.jobs) ? [...state.jobs] : [];
+      const keepExpenses = Array.isArray(state.expenses) ? [...state.expenses] : [];
 
       state = DEFAULT_STATE();
       state.lang = keepLang;
       state.business = keepBusiness;
       state.ui = keepUI;
       state.converter = keepConverter;
+      state.jobs = keepJobs;
+      state.expenses = keepExpenses;
       state.meta.invDate = todayStr();
 
       customSvcName.value = "";
@@ -3116,6 +3424,7 @@
       $$("#btnImport").addEventListener("click", importJSON);
       $$("#btnUseCurrentEstimate").addEventListener("click", fillJobFormFromCurrent);
       $$("#btnSaveTrackedJob").addEventListener("click", saveTrackedJob);
+      $$("#btnSaveExpense").addEventListener("click", saveExpense);
 
       langSel.addEventListener("change", () => applyLanguage(langSel.value));
     }
@@ -3134,9 +3443,11 @@
       renderBusinessHeader();
       renderServices();
       renderJobs();
+      renderExpenses();
       recalc();
       recalcConverter();
       clearJobTrackerForm();
+      clearExpenseForm();
       wireInputs();
     }
 
