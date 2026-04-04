@@ -447,6 +447,65 @@
       font-size:13px;
     }
 
+
+    .jobsGrid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:14px;
+    }
+    @media (max-width: 980px){
+      .jobsGrid{ grid-template-columns: 1fr; }
+    }
+    .jobFormCard,
+    .jobListCard{
+      border:1px solid var(--line);
+      border-radius:12px;
+      padding:12px;
+      background:rgba(255,255,255,.02);
+    }
+    .jobListHead{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      margin-bottom:10px;
+      flex-wrap:wrap;
+    }
+    .jobsEmpty{
+      border:1px dashed var(--line);
+      border-radius:12px;
+      padding:14px;
+      color:var(--muted);
+      font-size:13px;
+      background:rgba(255,255,255,.02);
+    }
+    .statusBadge{
+      display:inline-flex;
+      align-items:center;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.04);
+      font-size:12px;
+      white-space:nowrap;
+    }
+    .jobsTableWrap{
+      overflow:auto;
+    }
+    .jobsTableWrap table select{
+      min-width:130px;
+    }
+    .jobActions{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+    .jobMuted{
+      color:var(--muted);
+      font-size:12px;
+    }
+
     .hidden{ display:none !important; }
 
     body.pdf-client-export{
@@ -467,7 +526,8 @@
     body.pdf-client-export .btn,
     body.pdf-client-export .card.client-hidden,
     body.pdf-client-export .split.client-hidden,
-    body.pdf-client-export .client-hidden.card{
+    body.pdf-client-export .client-hidden.card,
+    body.pdf-client-export #jobsTrackerCard{
       display:none !important;
     }
     body.pdf-client-export .wrap{
@@ -598,6 +658,7 @@
       }
 
       .btn, .pill, .toast, details.accordion,
+      #jobsTrackerCard,
       .clientControls,
       .sectionActions,
       .svcAdd,
@@ -1243,6 +1304,79 @@
       </div>
 
 
+
+      <div class="card client-hidden" id="jobsTrackerCard">
+        <div class="hd">
+          <h2 data-i18n="jobs_title">Simple Job Tracker</h2>
+          <div class="muted" data-i18n="jobs_sub">Save estimates, active jobs, and paid jobs in one place.</div>
+        </div>
+        <div class="bd">
+          <div class="jobsGrid">
+            <div class="jobFormCard">
+              <div class="row">
+                <div>
+                  <label data-i18n="jobs_client_label">Client Name</label>
+                  <input id="jobClientName" type="text" />
+                </div>
+                <div>
+                  <label data-i18n="jobs_name_label">Job Name</label>
+                  <input id="jobName" type="text" />
+                </div>
+              </div>
+              <div class="row">
+                <div>
+                  <label data-i18n="jobs_total_label">Total Price</label>
+                  <input id="jobTotal" type="text" inputmode="decimal" />
+                </div>
+                <div>
+                  <label data-i18n="jobs_status_label">Status</label>
+                  <select id="jobStatus"></select>
+                </div>
+              </div>
+              <div class="row">
+                <div>
+                  <label data-i18n="jobs_date_label">Date</label>
+                  <input id="jobTrackDate" type="text" />
+                </div>
+                <div></div>
+              </div>
+              <div class="split">
+                <button class="btn" id="btnUseCurrentEstimate" data-i18n="btn_use_current_estimate">Use current estimate</button>
+                <button class="btn primary" id="btnSaveTrackedJob" data-i18n="btn_save_tracked_job">Save job</button>
+              </div>
+              <div class="hint" style="margin-top:10px;" data-i18n="jobs_tip">
+                Keep this simple: Estimate = pending, In Progress = approved or active, Paid = done and collected.
+              </div>
+            </div>
+
+            <div class="jobListCard">
+              <div class="jobListHead">
+                <div>
+                  <div style="font-weight:600;" data-i18n="jobs_saved_title">Saved Jobs</div>
+                  <div class="jobMuted" data-i18n="jobs_saved_sub">Update status or delete when no longer needed.</div>
+                </div>
+              </div>
+              <div id="jobsEmpty" class="jobsEmpty" data-i18n="jobs_empty">No jobs saved yet.</div>
+              <div id="jobsTableWrap" class="jobsTableWrap hidden">
+                <table>
+                  <thead>
+                    <tr>
+                      <th data-i18n="jobs_th_client">Client</th>
+                      <th data-i18n="jobs_th_job">Job</th>
+                      <th data-i18n="jobs_th_total">Total</th>
+                      <th data-i18n="jobs_th_status">Status</th>
+                      <th data-i18n="jobs_th_date">Date</th>
+                      <th data-i18n="jobs_th_actions">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="jobsTableBody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div id="footerMessage" class="footerMessage client-only">
         Thank you for choosing Anchored Landscaping LLC. We truly appreciate the opportunity to work with you and take pride in delivering quality results you can rely on. We look forward to helping you with any future landscaping needs.
       </div>
@@ -1279,6 +1413,34 @@
         client_mode_label: "Client Mode",
         client_services_title: "Services Included",
         footer_message: "Thank you for choosing Anchored Landscaping LLC. We truly appreciate the opportunity to work with you and take pride in delivering quality results you can rely on. We look forward to helping you with any future landscaping needs.",
+        jobs_title: "Simple Job Tracker",
+        jobs_sub: "Save estimates, active jobs, and paid jobs in one place.",
+        jobs_client_label: "Client Name",
+        jobs_name_label: "Job Name",
+        jobs_total_label: "Total Price",
+        jobs_status_label: "Status",
+        jobs_date_label: "Date",
+        jobs_saved_title: "Saved Jobs",
+        jobs_saved_sub: "Update status or delete when no longer needed.",
+        jobs_empty: "No jobs saved yet.",
+        jobs_th_client: "Client",
+        jobs_th_job: "Job",
+        jobs_th_total: "Total",
+        jobs_th_status: "Status",
+        jobs_th_date: "Date",
+        jobs_th_actions: "Actions",
+        jobs_tip: "Keep this simple: Estimate = pending, In Progress = approved or active, Paid = done and collected.",
+        btn_use_current_estimate: "Use current estimate",
+        btn_save_tracked_job: "Save job",
+        job_status_estimate: "Estimate",
+        job_status_progress: "In Progress",
+        job_status_paid: "Paid",
+        job_default_name: "Landscaping Job",
+        toast_job_saved: "Job saved.",
+        toast_job_deleted: "Job deleted.",
+        toast_job_status_saved: "Job status updated.",
+        toast_job_prefilled: "Job tracker filled from current estimate.",
+        toast_job_name_required: "Enter a job name first.",
 
         lab_bizname: "Business name",
         ph_bizname: "Your business name",
@@ -1646,6 +1808,7 @@
         travelOn:false, travelFee:0
       },
       services: [],
+      jobs: [],
       ui: { clientMode:false },
       converter: {
         mode:"rect",
@@ -1783,6 +1946,15 @@
     const clientServiceSummary = $$("#clientServiceSummary");
     const clientServiceList = $$("#clientServiceList");
     const footerMessage = $$("#footerMessage");
+    const jobClientName = $$("#jobClientName");
+    const jobName = $$("#jobName");
+    const jobTotal = $$("#jobTotal");
+    const jobStatus = $$("#jobStatus");
+    const jobTrackDate = $$("#jobTrackDate");
+    const jobsEmpty = $$("#jobsEmpty");
+    const jobsTableWrap = $$("#jobsTableWrap");
+    const jobsTableBody = $$("#jobsTableBody");
+
 
     const convMaterial = $$("#convMaterial");
     const convDepth = $$("#convDepth");
@@ -1800,6 +1972,148 @@
     const rTons = $$("#rTons");
     const convNoteText = $$("#convNoteText");
     const convExtraText = $$("#convExtraText");
+
+
+    function getJobStatusOptions(){
+      return [
+        { value:"Estimate", label:t("job_status_estimate") },
+        { value:"In Progress", label:t("job_status_progress") },
+        { value:"Paid", label:t("job_status_paid") }
+      ];
+    }
+
+    function buildJobStatusPicker(){
+      jobStatus.innerHTML = "";
+      getJobStatusOptions().forEach(optData => {
+        const opt = document.createElement("option");
+        opt.value = optData.value;
+        opt.textContent = optData.label;
+        jobStatus.appendChild(opt);
+      });
+      jobStatus.value = "Estimate";
+    }
+
+    function getJobStatusLabel(value){
+      if (value === "In Progress") return t("job_status_progress");
+      if (value === "Paid") return t("job_status_paid");
+      return t("job_status_estimate");
+    }
+
+    function getSuggestedJobName(){
+      if (state.services && state.services.length){
+        if (state.services.length === 1) return state.services[0].name || t("job_default_name");
+        return state.services.slice(0, 2).map(s => s.name).filter(Boolean).join(" + ") || t("job_default_name");
+      }
+      return t("job_default_name");
+    }
+
+    function getCurrentGrandTotalValue(){
+      const n = parseNumLoose(tGrand.textContent || "");
+      return isFinite(n) ? Math.max(0, n) : 0;
+    }
+
+    function fillJobFormFromCurrent(){
+      syncStateFromForm();
+      jobClientName.value = (state.meta.custName || "").trim();
+      jobName.value = getSuggestedJobName();
+      jobTotal.value = getCurrentGrandTotalValue() > 0 ? toFixed2(getCurrentGrandTotalValue()) : "";
+      jobStatus.value = "Estimate";
+      jobTrackDate.value = (state.meta.invDate || todayStr()).trim();
+      toast(t("toast_job_prefilled"));
+    }
+
+    function clearJobTrackerForm(){
+      jobClientName.value = "";
+      jobName.value = "";
+      jobTotal.value = "";
+      jobStatus.value = "Estimate";
+      jobTrackDate.value = todayStr();
+    }
+
+    function renderJobs(){
+      const jobs = Array.isArray(state.jobs) ? state.jobs : [];
+      jobsTableBody.innerHTML = "";
+
+      if (!jobs.length){
+        jobsEmpty.classList.remove("hidden");
+        jobsTableWrap.classList.add("hidden");
+        return;
+      }
+
+      jobsEmpty.classList.add("hidden");
+      jobsTableWrap.classList.remove("hidden");
+
+      jobs.forEach(job => {
+        const tr = document.createElement("tr");
+        const statusOptions = getJobStatusOptions().map(opt => `<option value="${escapeHtml(opt.value)}" ${job.status === opt.value ? "selected" : ""}>${escapeHtml(opt.label)}</option>`).join("");
+        tr.innerHTML = `
+          <td data-label="${escapeHtml(t("jobs_th_client"))}">
+            <div style="font-weight:600;">${escapeHtml(job.clientName || "—")}</div>
+          </td>
+          <td data-label="${escapeHtml(t("jobs_th_job"))}">
+            <div style="font-weight:600;">${escapeHtml(job.jobName || "—")}</div>
+          </td>
+          <td data-label="${escapeHtml(t("jobs_th_total"))}">${money(clampNonNeg(job.total || 0))}</td>
+          <td data-label="${escapeHtml(t("jobs_th_status"))}">
+            <select data-job-action="status" data-job-id="${escapeHtml(job.id)}">${statusOptions}</select>
+          </td>
+          <td data-label="${escapeHtml(t("jobs_th_date"))}">${escapeHtml(job.date || "—")}</td>
+          <td data-label="${escapeHtml(t("jobs_th_actions"))}">
+            <div class="jobActions">
+              <button class="btn small danger" data-job-action="delete" data-job-id="${escapeHtml(job.id)}">${escapeHtml(t("btn_remove"))}</button>
+            </div>
+          </td>
+        `;
+        jobsTableBody.appendChild(tr);
+      });
+
+      jobsTableBody.querySelectorAll('[data-job-action="status"]').forEach(el => {
+        el.addEventListener("change", () => {
+          const id = el.getAttribute("data-job-id");
+          const job = state.jobs.find(item => item.id === id);
+          if (!job) return;
+          job.status = el.value || "Estimate";
+          autosave();
+          renderJobs();
+          toast(t("toast_job_status_saved"));
+        });
+      });
+
+      jobsTableBody.querySelectorAll('[data-job-action="delete"]').forEach(btn => {
+        btn.addEventListener("click", () => {
+          const id = btn.getAttribute("data-job-id");
+          state.jobs = (state.jobs || []).filter(item => item.id !== id);
+          autosave();
+          renderJobs();
+          toast(t("toast_job_deleted"));
+        });
+      });
+    }
+
+    function saveTrackedJob(){
+      const rawName = (jobName.value || "").trim();
+      if (!rawName){
+        toast(t("toast_job_name_required"));
+        jobName.focus();
+        return;
+      }
+
+      state.jobs = Array.isArray(state.jobs) ? state.jobs : [];
+      state.jobs.unshift({
+        id: `job_${Date.now()}_${Math.random().toString(36).slice(2,8)}`,
+        clientName: (jobClientName.value || "").trim(),
+        jobName: rawName,
+        total: Math.max(0, parseNumLoose(jobTotal.value) || 0),
+        status: jobStatus.value || "Estimate",
+        date: (jobTrackDate.value || todayStr()).trim()
+      });
+
+      autosave();
+      renderJobs();
+      clearJobTrackerForm();
+      toast(t("toast_job_saved"));
+    }
+
 
     function buildServicePicker(){
       while (svcPicker.options.length > 1) svcPicker.remove(1);
@@ -2458,6 +2772,11 @@
       customSvcName.placeholder = t("ph_custom_job");
       customSvcUnit.placeholder = t("ph_custom_unit");
       customSvcPrice.placeholder = t("ph_custom_price");
+      jobClientName.placeholder = t("ph_custname");
+      jobName.placeholder = t("job_default_name");
+      jobTotal.placeholder = "0.00";
+      if (!jobTrackDate.value) jobTrackDate.value = todayStr();
+      buildJobStatusPicker();
 
       laborRate.value   = state.settings.laborRate===0 ? "" : toFixed2(state.settings.laborRate);
       laborHours.value  = state.settings.laborHours===0 ? "" : String(state.settings.laborHours);
@@ -2490,6 +2809,7 @@
       setConverterMode(state.converter.mode || "rect");
       footerMessage.textContent = t("footer_message");
       renderClientServiceSummary();
+      renderJobs();
       setClientMode(!!(state.ui && state.ui.clientMode), true);
     }
 
@@ -2509,6 +2829,7 @@
         state.meta = Object.assign(base.meta, obj.meta || {});
         state.ui = Object.assign(base.ui, obj.ui || {});
         state.converter = Object.assign(base.converter, obj.converter || {});
+        state.jobs = Array.isArray(obj.jobs) ? obj.jobs : [];
 
         state.lang = (state.lang === "es") ? "es" : "en";
         return true;
@@ -2583,6 +2904,7 @@
           state.meta = Object.assign(base.meta, obj.meta || {});
           state.ui = Object.assign(base.ui, obj.ui || {});
           state.converter = Object.assign(base.converter, obj.converter || {});
+          state.jobs = Array.isArray(obj.jobs) ? obj.jobs : [];
           state.lang = (state.lang === "es") ? "es" : "en";
 
           syncFormFromState();
@@ -2792,6 +3114,8 @@
       $$("#btnDownloadClientPdf").addEventListener("click", downloadClientPdf);
       $$("#btnExport").addEventListener("click", exportJSON);
       $$("#btnImport").addEventListener("click", importJSON);
+      $$("#btnUseCurrentEstimate").addEventListener("click", fillJobFormFromCurrent);
+      $$("#btnSaveTrackedJob").addEventListener("click", saveTrackedJob);
 
       langSel.addEventListener("change", () => applyLanguage(langSel.value));
     }
@@ -2809,8 +3133,10 @@
       applyLanguage(state.lang || "en", true);
       renderBusinessHeader();
       renderServices();
+      renderJobs();
       recalc();
       recalcConverter();
+      clearJobTrackerForm();
       wireInputs();
     }
 
