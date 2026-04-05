@@ -18,16 +18,17 @@ function toggleMenu(){
 }
 
 function showSection(id){
-  const sections = [
-    'calculatorSection',
-    'jobsTrackerCard',
-    'moneyTrackerCard',
-    'converterCard'
-  ];
-  sections.forEach(s=>{
-    const el = document.getElementById(s);
-    if(el) el.style.display = (s===id ? 'block':'none');
-  });
+  const calc = document.getElementById('calculatorSection');
+  const jobs = document.getElementById('jobsTrackerCard');
+
+  if(id === 'jobsTrackerCard'){
+    if(calc) calc.style.display = 'none';
+    if(jobs) jobs.style.display = 'block';
+  } else if(id === 'calculatorSection'){
+    if(calc) calc.style.display = 'block';
+    if(jobs) jobs.style.display = 'none';
+  }
+
   toggleMenu();
 }
 
@@ -3577,16 +3578,17 @@ function toggleMenu(){
 }
 
 function showSection(id){
-  const sections = [
-    'calculatorSection',
-    'jobsTrackerCard',
-    'moneyTrackerCard',
-    'converterCard'
-  ];
-  sections.forEach(s=>{
-    const el = document.getElementById(s);
-    if(el) el.style.display = (s===id ? 'block':'none');
-  });
+  const calc = document.getElementById('calculatorSection');
+  const jobs = document.getElementById('jobsTrackerCard');
+
+  if(id === 'jobsTrackerCard'){
+    if(calc) calc.style.display = 'none';
+    if(jobs) jobs.style.display = 'block';
+  } else if(id === 'calculatorSection'){
+    if(calc) calc.style.display = 'block';
+    if(jobs) jobs.style.display = 'none';
+  }
+
   toggleMenu();
 }
 
@@ -3604,16 +3606,17 @@ function toggleMenu(){
 }
 
 function showSection(id){
-  const sections = [
-    'calculatorSection',
-    'jobsTrackerCard',
-    'moneyTrackerCard',
-    'converterCard'
-  ];
-  sections.forEach(s=>{
-    const el = document.getElementById(s);
-    if(el) el.style.display = (s===id ? 'block':'none');
-  });
+  const calc = document.getElementById('calculatorSection');
+  const jobs = document.getElementById('jobsTrackerCard');
+
+  if(id === 'jobsTrackerCard'){
+    if(calc) calc.style.display = 'none';
+    if(jobs) jobs.style.display = 'block';
+  } else if(id === 'calculatorSection'){
+    if(calc) calc.style.display = 'block';
+    if(jobs) jobs.style.display = 'none';
+  }
+
   toggleMenu();
 }
 
