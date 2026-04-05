@@ -1313,7 +1313,7 @@
     </div>
 
     <div class="stack" id="calculatorStack">
-      <div class="card client-hidden">
+      <div class="card client-hidden" id="converterCard">
         <div class="hd">
           <h2 data-i18n="converter_title">Material Converter</h2>
           <div class="split">
@@ -1403,7 +1403,7 @@
 
 
 
-      <div class="card client-hidden" id="jobsTrackerCard">
+      <div class="card client-hidden" id="jobsTrackerCard" style="display:none;">
         <div class="hd">
           <h2 data-i18n="jobs_title">Simple Job Tracker</h2>
           <div class="muted" data-i18n="jobs_sub">Save estimates, active jobs, and paid jobs in one place.</div>
@@ -2893,6 +2893,25 @@
       setTimeout(function(){ window.print(); }, 250);
     });
   <\/script>
+
+<script>
+function showSection(id){
+  const calc = document.getElementById('calculatorSection');
+  const jobs = document.getElementById('jobsTrackerCard');
+
+  if(id === 'jobsTrackerCard'){
+    if(calc) calc.style.display = 'none';
+    if(jobs) jobs.style.display = 'block';
+  } else if(id === 'calculatorSection'){
+    if(calc) calc.style.display = 'block';
+    if(jobs) jobs.style.display = 'none';
+  }
+
+  const panel = document.getElementById('menuPanel');
+  if(panel) panel.classList.remove('show');
+}
+</script>
+
 </body>
 </html>`;
     }
@@ -3630,5 +3649,24 @@ function showSection(id){
 }
 
 </script>
+
+<script>
+function showSection(id){
+  const calc = document.getElementById('calculatorSection');
+  const jobs = document.getElementById('jobsTrackerCard');
+
+  if(id === 'jobsTrackerCard'){
+    if(calc) calc.style.display = 'none';
+    if(jobs) jobs.style.display = 'block';
+  } else if(id === 'calculatorSection'){
+    if(calc) calc.style.display = 'block';
+    if(jobs) jobs.style.display = 'none';
+  }
+
+  const panel = document.getElementById('menuPanel');
+  if(panel) panel.classList.remove('show');
+}
+</script>
+
 </body>
 </html>
